@@ -6,8 +6,11 @@
     <title>Snaked - Board Game</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts: Game-like title and clean playful body -->
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Poppins:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Poppins:wght@300;400;600;700;900&family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/styles.css">
+    <style>
+        .font-bahnschrift { font-family: 'Bahnschrift', 'Fredoka', sans-serif; }
+    </style>
 </head>
 <body class="bg-slate-900 text-slate-200 font-sans h-screen overflow-hidden selection:bg-emerald-500/30 relative">
 
@@ -25,7 +28,7 @@
         <div class="menu-container">
             <!-- Header: Title and Subtitle -->
             <div class="menu-header">
-                <h1 class="menu-title" style="font-family: 'Orbitron', sans-serif;">SNAKED</h1>
+                <h1 class="menu-title" style="font-family: 'Bahnschrift', 'Fredoka', 'Orbitron', sans-serif;">SNAKED</h1>
                 <p class="menu-subtitle" style="font-family: 'Poppins', sans-serif;">Not the Ordinary Snake & Ladder</p>
             </div>
 
@@ -43,28 +46,31 @@
                 <!-- Divider -->
                 <div class="menu-button-divider"></div>
 
-                <!-- Multiplayer buttons (disabled for future) -->
+                <!-- Multiplayer buttons -->
                 <div class="menu-multiplayer-group">
                     <button 
-                        disabled 
+                        onclick="AudioSys.menuClick(); handleCreateRoom()" 
                         onmouseover="AudioSys.menuHover()"
-                        class="menu-btn menu-btn-secondary menu-btn-disabled"
-                        title="Coming Soon">
+                        class="menu-btn menu-btn-secondary"
+                        title="Create an online match">
                         <span id="icon-create-room"></span>
                         <span class="menu-btn-label">Create Room</span>
-                        <span class="menu-btn-badge" style="font-family: 'Poppins', sans-serif;">Soon</span>
                     </button>
-
+                    
                     <button 
-                        disabled 
+                        onclick="AudioSys.menuClick(); document.getElementById('modal-join-room').classList.remove('hidden'); document.getElementById('modal-join-room').classList.add('flex')" 
                         onmouseover="AudioSys.menuHover()"
-                        class="menu-btn menu-btn-secondary menu-btn-disabled"
-                        title="Coming Soon">
+                        class="menu-btn menu-btn-secondary"
+                        title="Join an existing match">
                         <span id="icon-join-room"></span>
                         <span class="menu-btn-label">Join Room</span>
-                        <span class="menu-btn-badge" style="font-family: 'Poppins', sans-serif;">Soon</span>
                     </button>
                 </div>
+            </div>
+
+            <!-- Profile Panel -->
+            <div id="profile-panel" class="bg-slate-950/60 p-6 rounded-2xl border border-slate-700/50 backdrop-blur-md w-full max-w-[320px] shadow-2xl">
+                <!-- Profile UI injected here by profile.js -->
             </div>
 
             <!-- Sound toggle (bottom) -->
@@ -131,42 +137,51 @@
     <!-- ==========================================================================
          SCREEN X: GAME SETTINGS
          ========================================================================== -->
-    <div id="screen-game-settings" class="screen hidden-screen items-center justify-center z-20">
-        <div class="bg-slate-800/90 backdrop-blur-xl p-6 rounded-3xl border border-slate-700 max-w-2xl w-full text-left panel-3d ring-1 ring-white/10">
-            <h2 class="text-2xl font-black mb-4 text-white drop-shadow-md">Game Settings</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                    <label class="block text-xs font-bold mb-2 text-slate-400 uppercase tracking-widest">Game Time (seconds)</label>
-                    <input id="cfg-game-time" type="number" min="0" value="300" class="w-full p-3 rounded-xl bg-slate-900 border border-slate-700 text-white" />
-                    <p class="text-[11px] text-slate-500 mt-1">0 = no global time limit</p>
-                </div>
-                <div>
-                    <label class="block text-xs font-bold mb-2 text-slate-400 uppercase tracking-widest">Turn Time (seconds)</label>
-                    <input id="cfg-turn-time" type="number" min="0" value="10" class="w-full p-3 rounded-xl bg-slate-900 border border-slate-700 text-white" />
-                    <p class="text-[11px] text-slate-500 mt-1">0 = no per-turn limit</p>
-                </div>
-                <div class="md:col-span-2">
-                    <label class="block text-xs font-bold mb-2 text-slate-400 uppercase tracking-widest">Players</label>
-                    <div class="flex gap-2 items-center mb-2">
-                        <label class="text-slate-400 text-sm">Count</label>
-                        <select id="cfg-player-count" class="p-2 rounded-lg bg-slate-900 border border-slate-700 text-white">
-                            <option value="2">2</option>
-                            <option value="3">3</option>
-                            <option value="4">4</option>
-                            <option value="5">5</option>
-                            <option value="6">6</option>
-                        </select>
+    <div id="screen-game-settings" class="screen hidden-screen items-center justify-center z-20 py-8 overflow-y-auto">
+        <div class="bg-slate-800/95 backdrop-blur-xl p-8 rounded-3xl border border-slate-700 max-w-4xl w-full text-left panel-3d ring-1 ring-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.8)] my-auto mx-4">
+            <h2 class="text-4xl font-black mb-8 text-white drop-shadow-md tracking-wide" style="font-family: 'Bahnschrift', 'Fredoka', sans-serif;">Game Settings</h2>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Left Column: Timers & Players -->
+                <div class="flex flex-col gap-6">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="bg-slate-900/60 p-4 rounded-2xl border border-slate-700/50 shadow-inner">
+                            <label class="block text-sm font-black mb-3 text-slate-400 uppercase tracking-widest flex items-center gap-2"><span class="w-4 h-4 text-emerald-400" id="icon-cfg-timer1"></span> Game Time (sec)</label>
+                            <input id="cfg-game-time" type="number" min="0" value="300" class="w-full p-4 rounded-xl bg-slate-950 border border-slate-700 text-white font-mono text-xl focus:ring-2 focus:ring-emerald-500 transition-all outline-none" />
+                            <p class="text-xs text-slate-500 mt-2 font-medium">0 = infinite match</p>
+                        </div>
+                        <div class="bg-slate-900/60 p-4 rounded-2xl border border-slate-700/50 shadow-inner">
+                            <label class="block text-sm font-black mb-3 text-slate-400 uppercase tracking-widest flex items-center gap-2"><span class="w-4 h-4 text-blue-400" id="icon-cfg-timer2"></span> Turn Time (sec)</label>
+                            <input id="cfg-turn-time" type="number" min="0" value="10" class="w-full p-4 rounded-xl bg-slate-950 border border-slate-700 text-white font-mono text-xl focus:ring-2 focus:ring-blue-500 transition-all outline-none" />
+                            <p class="text-xs text-slate-500 mt-2 font-medium">0 = no turn limit</p>
+                        </div>
                     </div>
-                    <div id="cfg-player-slots" class="grid grid-cols-1 sm:grid-cols-2 gap-2"></div>
+                    
+                    <div class="bg-slate-900/60 p-5 rounded-2xl border border-slate-700/50 shadow-inner flex-1 flex flex-col">
+                        <div class="flex justify-between items-center mb-4">
+                            <label class="text-sm font-black text-slate-400 uppercase tracking-widest flex items-center gap-2"><span class="w-5 h-5 text-purple-400" id="icon-cfg-users"></span> Players</label>
+                            <select id="cfg-player-count" class="p-2.5 rounded-xl bg-slate-800 border border-slate-600 text-white font-bold text-base focus:ring-2 focus:ring-purple-500 outline-none cursor-pointer">
+                                <option value="2">2 Players</option>
+                                <option value="3">3 Players</option>
+                                <option value="4">4 Players</option>
+                                <option value="5">5 Players</option>
+                                <option value="6">6 Players</option>
+                            </select>
+                        </div>
+                        <div id="cfg-player-slots" class="flex flex-col gap-3 overflow-y-auto pr-2" style="max-height: 250px;"></div>
+                    </div>
                 </div>
-                <div class="md:col-span-2">
-                    <label class="block text-xs font-bold mb-2 text-slate-400 uppercase tracking-widest">Power-ups</label>
-                    <div id="cfg-powerups" class="flex flex-wrap gap-2"></div>
+
+                <!-- Right Column: Power-ups -->
+                <div class="bg-slate-900/60 p-5 rounded-2xl border border-slate-700/50 shadow-inner flex flex-col h-full">
+                    <label class="block text-sm font-black mb-4 text-slate-400 uppercase tracking-widest flex items-center gap-2"><span class="w-5 h-5 text-orange-400" id="icon-cfg-power"></span> Enabled Power-ups</label>
+                    <div id="cfg-powerups" class="grid grid-cols-2 gap-3 overflow-y-auto pr-2" style="max-height: 400px;"></div>
                 </div>
             </div>
-            <div class="mt-4 flex justify-end gap-3">
-                <button onclick="navTo('screen-main-menu')" class="btn-3d bg-slate-700 text-sm px-4 py-2 rounded-xl">Cancel</button>
-                <button id="cfg-start-btn" class="btn-3d bg-emerald-500 text-white font-black px-4 py-2 rounded-xl">Start Match</button>
+            
+            <div class="mt-8 pt-6 border-t border-slate-700 flex justify-end gap-4">
+                <button onclick="navTo('screen-main-menu')" class="btn-3d bg-gradient-to-b from-slate-700 to-slate-800 hover:from-slate-600 hover:to-slate-700 text-white font-bold py-4 px-8 rounded-xl border-slate-900 text-lg transition-all shadow-lg">Cancel</button>
+                <button id="cfg-start-btn" class="btn-3d bg-gradient-to-b from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 text-white font-black py-4 px-10 rounded-xl border-emerald-800 text-xl tracking-wider transition-all shadow-[0_0_20px_rgba(16,185,129,0.4)]">Start Match</button>
             </div>
         </div>
     </div>
@@ -176,8 +191,9 @@
         <header class="bg-slate-900 text-white p-2 sm:p-3 shadow-xl flex justify-between items-center z-30 shrink-0 border-b border-slate-800 panel-3d">
             <div class="flex items-center gap-4">
                 <h1 class="text-xl sm:text-2xl font-black tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-400 ml-2 drop-shadow-md">SNAKED</h1>
-                <div id="global-timer" class="text-sm font-mono font-bold text-slate-300 bg-slate-800/80 px-3 py-1.5 rounded-lg border border-slate-700 shadow-inner hidden">
-                    ⏱️ <span id="global-timer-text">--:--</span>
+                <div id="global-timer" class="text-sm font-mono font-bold text-slate-300 bg-slate-800/80 px-3 py-1.5 rounded-lg border border-slate-700 shadow-inner hidden flex items-center gap-1.5">
+                    <span id="icon-global-timer" class="w-4 h-4 text-emerald-400"></span>
+                    <span id="global-timer-text">--:--</span>
                 </div>
             </div>
             <div id="game-status-banner" class="text-xs sm:text-sm font-bold bg-slate-800/80 px-5 py-2 rounded-full shadow-inner border border-slate-700 flex items-center gap-2">
@@ -295,10 +311,63 @@
         </div>
     </div>
 
+    <!-- Lobby Modal -->
+    <div id="modal-lobby" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md hidden flex-col items-center justify-center z-50">
+        <div class="bg-gradient-to-b from-slate-800 to-slate-900 p-8 rounded-3xl border border-slate-700 w-full max-w-lg panel-3d shadow-2xl mx-4 flex flex-col">
+            <div class="text-center mb-6">
+                <h2 class="text-3xl font-black text-white drop-shadow-md uppercase tracking-widest">Match Lobby</h2>
+                <div class="mt-2 bg-slate-950 inline-block px-4 py-2 rounded-lg border border-slate-700">
+                    <span class="text-slate-400 text-sm">Room Code: </span>
+                    <span id="lobby-code-display" class="font-mono font-bold text-emerald-400 text-xl tracking-widest select-all">------</span>
+                </div>
+            </div>
+            
+            <div class="bg-slate-950/50 rounded-xl border border-slate-700/50 p-4 mb-6 flex-grow overflow-y-auto max-h-[40vh]">
+                <h3 class="text-slate-400 font-bold mb-3 text-sm tracking-wide border-b border-slate-700/50 pb-2">Players Connected (<span id="lobby-count">1</span>/6)</h3>
+                <div id="lobby-players-list" class="flex flex-col gap-2">
+                    <!-- Players injected dynamically -->
+                </div>
+            </div>
+
+            <div class="flex flex-col gap-3 mt-auto">
+                <button id="btn-lobby-start" onclick="handleStartOnlineGame()" class="btn-3d w-full bg-gradient-to-b from-emerald-500 to-emerald-600 text-white font-bold py-3.5 rounded-xl shadow-lg border-emerald-800 uppercase tracking-wide opacity-50 cursor-not-allowed hidden">
+                    Start Game
+                </button>
+                <div id="lobby-waiting-msg" class="text-center text-emerald-400 font-bold text-sm hidden py-2">
+                    <span class="animate-pulse">Waiting for Host to start the game...</span>
+                </div>
+                <button onclick="handleCancelRoom()" class="btn-3d w-full bg-slate-700 hover:bg-slate-600 text-white font-bold py-3 rounded-xl border-slate-800 uppercase tracking-wide">
+                    Leave Lobby
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Join Room Modal -->
+    <div id="modal-join-room" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md hidden flex-col items-center justify-center z-50">
+        <div class="bg-gradient-to-b from-slate-800 to-slate-900 p-8 rounded-3xl border border-slate-700 text-center max-w-sm w-full panel-3d shadow-2xl mx-4">
+            <h2 class="text-2xl font-black text-white mb-4 drop-shadow-md">Join Match</h2>
+            <p class="text-slate-400 mb-6 text-sm">Enter the 6-character room code:</p>
+            <input type="text" id="join-room-input" maxlength="6" class="w-full bg-slate-950 p-4 rounded-xl text-3xl font-mono font-bold text-center text-white border border-slate-700 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 outline-none uppercase mb-6" placeholder="XXXXXX" />
+            <div class="flex flex-col gap-3">
+                <button onclick="handleJoinRoomSubmit()" class="btn-3d w-full bg-gradient-to-b from-blue-500 to-blue-600 text-white font-bold py-3 rounded-xl shadow-lg border-blue-800">
+                    Join Room
+                </button>
+                <button onclick="document.getElementById('modal-join-room').classList.add('hidden'); document.getElementById('modal-join-room').classList.remove('flex');" class="btn-3d w-full bg-slate-700 hover:bg-slate-600 text-white font-bold py-3 rounded-xl border-slate-800">
+                    Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="js/icons.js"></script>
     <script src="js/audio.js"></script>
     <script src="js/config.js"></script>
+    <script src="js/profile.js"></script>
+    <script src="js/supabaseConfig.js"></script>
+    <script src="js/network.js"></script>
     <script src="js/gameConfig.js"></script>
     <script src="js/state.js"></script>
     <script src="js/ui.js"></script>

@@ -32,7 +32,14 @@ const ICONS = {
     roulette: `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polygon points="12 2 12 12 19.07 4.93"></polygon></svg>`,
     leaderboard: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20v-8"/><path d="M6 20V4"/><path d="M18 20v-4"/></svg>`,
     plus: `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>`,
-    signIn: `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path><polyline points="10 17 15 12 10 7"></polyline><line x1="15" y1="12" x2="3" y2="12"></line></svg>`
+    signIn: `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path><polyline points="10 17 15 12 10 7"></polyline><line x1="15" y1="12" x2="3" y2="12"></line></svg>`,
+    upTile: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 4l-7 7h4v9h6v-9h4z"></path></svg>`,
+    downTile: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 20l7-7h-4V4H9v9H5z"></path></svg>`,
+    leftTile: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M4 12l7-7v4h9v6h-9v4z"></path></svg>`,
+    rightTile: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M20 12l-7 7v-4H4V9h9V5z"></path></svg>`,
+    freezeTile: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M2 12h20M4.9 4.9l14.2 14.2M19.1 4.9L4.9 19.1"></path></svg>`,
+    timer: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>`,
+    stopwatch: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"></circle><polyline points="12 9 12 13 14 15"></polyline><line x1="10" y1="2" x2="14" y2="2"></line></svg>`
 };
 
 // Initialize icons on DOM load
@@ -49,4 +56,11 @@ document.addEventListener('DOMContentLoaded', () => {
     if (document.getElementById('icon-resume')) document.getElementById('icon-resume').innerHTML = ICONS.resume;
     if (document.getElementById('dice-display')) document.getElementById('dice-display').innerHTML = ICONS.dice;
     if (document.getElementById('icon-leaderboard-header')) document.getElementById('icon-leaderboard-header').innerHTML = ICONS.leaderboard;
+    if (document.getElementById('icon-global-timer')) document.getElementById('icon-global-timer').innerHTML = ICONS.stopwatch;
+    
+    // Config screen icons
+    if (document.getElementById('icon-cfg-timer1')) document.getElementById('icon-cfg-timer1').innerHTML = ICONS.stopwatch;
+    if (document.getElementById('icon-cfg-timer2')) document.getElementById('icon-cfg-timer2').innerHTML = ICONS.timer;
+    if (document.getElementById('icon-cfg-users')) document.getElementById('icon-cfg-users').innerHTML = ICONS.users;
+    if (document.getElementById('icon-cfg-power')) document.getElementById('icon-cfg-power').innerHTML = ICONS.powerup;
 });

@@ -192,3 +192,33 @@ function clearGameTimer() {
     state.gameTimeRemaining = null;
     updateGlobalTimerDisplay(true);
 }
+
+// ==========================================
+// Multiplayer UI Handlers
+// ==========================================
+
+function handleCreateRoom() {
+    // Instead of instantly creating a room, open settings first
+    openSettings('online_host');
+}
+
+async function handleCancelRoom() {
+    if (Network.joinInterval) clearInterval(Network.joinInterval);
+    await Network.leaveRoom();
+    document.getElementById('modal-create-room').classList.add('hidden');
+    document.getElementById('modal-create-room').classList.remove('flex');
+}
+
+async function handleJoinRoomSubmit() {
+    const code = document.getElementById('join-room-input').value.trim();
+    if (code.length === 6) {
+        const success = await Network.joinRoom(code);
+        if (success) {
+            document.getElementById('modal-join-room').classList.add('hidden');
+            document.getElementById('modal-join-room').classList.remove('flex');
+            navTo('screen-game');
+        }
+    } else {
+        alert("Please enter a valid 6-character room code.");
+    }
+}

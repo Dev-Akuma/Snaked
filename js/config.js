@@ -52,7 +52,11 @@ const PLAYER_COLORS = [
     { name: 'Red', hex: '#ef4444' },    
     { name: 'Blue', hex: '#3b82f6' },   
     { name: 'Green', hex: '#10b981' },  
-    { name: 'Yellow', hex: '#eab308' }  
+    { name: 'Yellow', hex: '#eab308' },
+    { name: 'Purple', hex: '#a855f7' },
+    { name: 'Orange', hex: '#f97316' },
+    { name: 'Cyan', hex: '#06b6d4' },
+    { name: 'Pink', hex: '#ec4899' }
 ];
 
 // Utility functions
@@ -74,14 +78,13 @@ function formatPowerupName(key) {
 function getPowerupIcon(key) {
     if (key === 'bear_trap') return ICONS.trap;
     if (key === 'dry_ice') return ICONS.ice;
-    if (key === 'down_tile') return ICONS.downSnake;
     if (key === 'double_dice') return ICONS.doubleDice;
     if (key === 'switch_up') return ICONS.switch;
-    if (key === 'up_tile') return '⬆️';
-    if (key === 'down_tile') return '⬇️';
-    if (key === 'left_tile') return '⬅️';
-    if (key === 'right_tile') return '➡️';
-    if (key === 'freeze_tile') return '❄️';
+    if (key === 'up_tile') return `<span class="inline-block w-4 h-4">${ICONS.upTile}</span>`;
+    if (key === 'down_tile') return `<span class="inline-block w-4 h-4">${ICONS.downTile}</span>`;
+    if (key === 'left_tile') return `<span class="inline-block w-4 h-4">${ICONS.leftTile}</span>`;
+    if (key === 'right_tile') return `<span class="inline-block w-4 h-4">${ICONS.rightTile}</span>`;
+    if (key === 'freeze_tile') return `<span class="inline-block w-4 h-4">${ICONS.freezeTile}</span>`;
     return ICONS.powerup;
 }
 

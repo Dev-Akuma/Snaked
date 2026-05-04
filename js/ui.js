@@ -296,7 +296,7 @@ function updateTimerDisplay(forceClear = false) {
         if(forceClear || state.players[state.currentPlayerIndex].isBot) {
             timerEl.innerHTML = '';
         } else {
-            timerEl.innerHTML = `⏳ <span class="${state.timeRemaining <= 3 ? 'text-red-400 animate-pulse font-black' : 'text-slate-300'}">${state.timeRemaining}s</span>`;
+            timerEl.innerHTML = `<span class="inline-block w-3.5 h-3.5 text-slate-400 mr-1 align-text-bottom">${ICONS.timer}</span><span class="${state.timeRemaining <= 3 ? 'text-red-400 animate-pulse font-black' : 'text-slate-300'}">${state.timeRemaining}s</span>`;
         }
     });
 }

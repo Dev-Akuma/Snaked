@@ -3,6 +3,10 @@
    ========================================================================== */
 
 function handleRollClick() {
+    if (typeof Network !== 'undefined' && Network.roomId && state.currentPlayerIndex !== Network.playerId) {
+        logMessage(`<span class="log-icon text-red-500">${ICONS.x}</span> Not your turn!`, 'text-red-400');
+        return;
+    }
     clearTurnTimer();
     if (!state.isAnimating && state.status === 'playing' && !state.isPaused) rollDice();
 }
@@ -178,7 +182,7 @@ async function resolveCascadesVisually(cp) {
             
             if (effect.type === 'up') {
                 newPos = getTileUp(currentPos);
-                logMessage(`<span class="log-icon text-emerald-400">⬆️</span> UP Tile! Moved up one row to <strong>${newPos}</strong>.`, 'text-emerald-400 font-bold');
+                logMessage(`<span class="log-icon text-emerald-400 w-4 h-4">${ICONS.upTile}</span> UP Tile! Moved up one row to <strong>${newPos}</strong>.`, 'text-emerald-400 font-bold');
                 AudioSys.powerup();
                 await delay(400);
                 await stepMovePlayer(cp, newPos, 100);
@@ -186,7 +190,7 @@ async function resolveCascadesVisually(cp) {
                 continue;
             } else if (effect.type === 'down') {
                 newPos = getDownTile(currentPos);
-                logMessage(`<span class="log-icon text-red-400">⬇️</span> DOWN Tile! Moved down one row to <strong>${newPos}</strong>.`, 'text-red-400 font-bold');
+                logMessage(`<span class="log-icon text-red-400 w-4 h-4">${ICONS.downTile}</span> DOWN Tile! Moved down one row to <strong>${newPos}</strong>.`, 'text-red-400 font-bold');
                 AudioSys.powerup();
                 await delay(400);
                 await stepMovePlayer(cp, newPos, 100);
@@ -194,7 +198,7 @@ async function resolveCascadesVisually(cp) {
                 continue;
             } else if (effect.type === 'left') {
                 newPos = getTileLeft(currentPos);
-                logMessage(`<span class="log-icon text-blue-400">⬅️</span> LEFT Tile! Moved left to <strong>${newPos}</strong>.`, 'text-blue-400 font-bold');
+                logMessage(`<span class="log-icon text-blue-400 w-4 h-4">${ICONS.leftTile}</span> LEFT Tile! Moved left to <strong>${newPos}</strong>.`, 'text-blue-400 font-bold');
                 AudioSys.powerup();
                 await delay(400);
                 await stepMovePlayer(cp, newPos, 100);
@@ -202,7 +206,7 @@ async function resolveCascadesVisually(cp) {
                 continue;
             } else if (effect.type === 'right') {
                 newPos = getTileRight(currentPos);
-                logMessage(`<span class="log-icon text-yellow-400">➡️</span> RIGHT Tile! Moved right to <strong>${newPos}</strong>.`, 'text-yellow-400 font-bold');
+                logMessage(`<span class="log-icon text-yellow-400 w-4 h-4">${ICONS.rightTile}</span> RIGHT Tile! Moved right to <strong>${newPos}</strong>.`, 'text-yellow-400 font-bold');
                 AudioSys.powerup();
                 await delay(400);
                 await stepMovePlayer(cp, newPos, 100);
@@ -210,13 +214,13 @@ async function resolveCascadesVisually(cp) {
                 continue;
             } else if (effect.type === 'freeze') {
                 cp.skipTurns += 1;
-                logMessage(`<span class="log-icon text-cyan-400">❄️</span> FREEZE Tile! You will skip your next turn.`, 'text-cyan-400 font-bold');
+                logMessage(`<span class="log-icon text-cyan-400 w-4 h-4">${ICONS.freezeTile}</span> FREEZE Tile! You will skip your next turn.`, 'text-cyan-400 font-bold');
                 AudioSys.trap();
                 await delay(600);
             } else if (effect.type === 'bear_trap') {
                 let penalty = Math.floor(Math.random() * 6) + 1;
                 newPos = Math.max(1, currentPos - penalty);
-                logMessage(`<span class="log-icon text-orange-500">🪤</span> BEAR TRAP Tile! Back ${penalty} steps to <strong>${newPos}</strong>.`, 'text-orange-500 font-bold');
+                logMessage(`<span class="log-icon text-orange-500 w-4 h-4">${ICONS.trap}</span> BEAR TRAP Tile! Back ${penalty} steps to <strong>${newPos}</strong>.`, 'text-orange-500 font-bold');
                 AudioSys.trap();
                 await delay(600);
                 await stepMovePlayer(cp, newPos, 150);
@@ -230,7 +234,7 @@ async function resolveCascadesVisually(cp) {
                 for (let i = 0; i < numRows; i++) {
                     newPos = getDownTile(newPos);
                 }
-                logMessage(`<span class="log-icon text-rose-500">🐍</span> DOWN-SNAKE Tile (${dangerLevel})! Dropped ${numRows} ${numRows === 1 ? 'row' : 'rows'} to <strong>${newPos}</strong>.`, 'text-rose-500 font-bold');
+                logMessage(`<span class="log-icon text-rose-500 w-4 h-4">${ICONS.downSnake}</span> DOWN-SNAKE Tile (${dangerLevel})! Dropped ${numRows} ${numRows === 1 ? 'row' : 'rows'} to <strong>${newPos}</strong>.`, 'text-rose-500 font-bold');
                 AudioSys.snake();
                 await delay(600);
                 await stepMovePlayer(cp, newPos, 100);
@@ -265,6 +269,10 @@ async function triggerRoulette(player) {
 async function usePowerup() {
     if (state.isAnimating || state.isPaused) return;
     const cp = state.players[state.currentPlayerIndex];
+
+    if (typeof Network !== 'undefined' && Network.roomId && state.currentPlayerIndex !== Network.playerId) {
+        return;
+    }
     
     if (state.status === 'trap_placement') {
         state.status = 'playing';
@@ -332,6 +340,8 @@ function handleTileClick(tileNum) {
 }
 
 async function processNextTurn() {
+    const previousPlayerIndex = state.currentPlayerIndex;
+    
     state.turnCounter++;
     state.currentPlayerIndex = (state.currentPlayerIndex + 1) % state.players.length;
     
@@ -352,6 +362,10 @@ async function processNextTurn() {
     
     updateUI();
     
+    if (typeof Network !== 'undefined' && Network.roomId && previousPlayerIndex === Network.playerId) {
+        Network.syncState();
+    }
+    
     if (nextPlayer.isBot) {
         runBotSequence();
     } else {
@@ -364,7 +378,7 @@ function handleWin(player) {
     clearTurnTimer();
     updateUI();
     AudioSys.win();
-    logMessage(`<span class="log-icon text-yellow-400">${ICONS.trophy}</span> 🎉 <strong>${player.name} wins!</strong>`, 'text-emerald-400 text-lg');
+    logMessage(`<span class="log-icon text-yellow-400">${ICONS.trophy}</span> <strong>${player.name} wins!</strong>`, 'text-emerald-400 text-lg');
     
     DOM.winnerText.innerText = `${player.name} Wins!`;
     DOM.winnerText.style.color = player.color.hex;
