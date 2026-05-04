@@ -318,6 +318,390 @@
 }
 
 .anim-flash { animation: flash 0.6s ease-out forwards; }
+
+/* ==========================================================================
+   MAIN MENU STYLING (POLISHED PROFESSIONAL DESIGN)
+   ========================================================================== */
+
+/* Dynamic animated background overlay */
+.menu-bg-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    background: 
+        radial-gradient(circle at 20% 50%, rgba(6, 182, 212, 0.08) 0%, transparent 50%),
+        radial-gradient(circle at 80% 50%, rgba(59, 130, 246, 0.08) 0%, transparent 50%),
+        radial-gradient(circle at 50% 50%, rgba(34, 211, 153, 0.04) 0%, transparent 60%);
+    animation: menu-gradient-shift 15s ease-in-out infinite;
+    backdrop-filter: blur(0.5px);
+}
+
+/* Menu container - main card */
+.menu-container {
+    position: relative;
+    z-index: 10;
+    background: linear-gradient(135deg, rgba(15, 23, 42, 0.92) 0%, rgba(30, 41, 59, 0.88) 100%);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(148, 163, 184, 0.15);
+    border-radius: 2rem;
+    padding: 4rem 2.5rem;
+    max-width: 520px;
+    width: 90%;
+    box-shadow: 
+        0 0 60px rgba(0, 0, 0, 0.6),
+        0 0 40px rgba(52, 211, 153, 0.08),
+        inset 0 1px 2px rgba(255, 255, 255, 0.08);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2rem;
+    animation: menu-fade-in 0.8s ease-out forwards;
+    animation-delay: 0.2s;
+}
+
+/* Menu header section */
+.menu-header {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+    animation: menu-slide-down 0.8s ease-out forwards;
+    animation-delay: 0.3s;
+    opacity: 0;
+}
+
+/* Title styling - Large, bold, game-like */
+.menu-title {
+    font-size: 4.5rem;
+    font-weight: 900;
+    letter-spacing: 0.15em;
+    background: linear-gradient(135deg, #34d399 0%, #06b6d4 50%, #60a5fa 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-shadow: 0 0 40px rgba(52, 211, 153, 0.3);
+    filter: drop-shadow(0 4px 20px rgba(52, 211, 153, 0.2));
+    transform: translateZ(0);
+    transition: all 0.4s ease;
+}
+
+.menu-title:hover {
+    filter: drop-shadow(0 8px 30px rgba(52, 211, 153, 0.4));
+    transform: scale(1.02);
+}
+
+/* Subtitle styling - Clean, playful, lighter */
+.menu-subtitle {
+    font-size: 1.1rem;
+    font-weight: 300;
+    letter-spacing: 0.08em;
+    color: rgba(203, 213, 225, 0.8);
+    text-transform: uppercase;
+    tracking-widest: true;
+    margin-top: 0.5rem;
+    animation: menu-fade-in 0.8s ease-out forwards;
+    animation-delay: 0.5s;
+    opacity: 0;
+}
+
+/* Button group container */
+.menu-button-group {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+/* Button divider */
+.menu-button-divider {
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(148, 163, 184, 0.3), transparent);
+    margin: 0.5rem 0;
+}
+
+/* Multiplayer buttons group (side by side) */
+.menu-multiplayer-group {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    width: 100%;
+}
+
+/* Main button base styles */
+.menu-btn {
+    position: relative;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 700;
+    font-size: 1.1rem;
+    padding: 1.2rem 1.5rem;
+    border: none;
+    border-radius: 1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    transition: all 0.25s cubic-bezier(0.2, 0.6, 0.3, 1);
+    outline: none;
+    overflow: hidden;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    
+    /* 3D depth effect */
+    box-shadow: 
+        0 8px 16px rgba(0, 0, 0, 0.3),
+        0 4px 8px rgba(0, 0, 0, 0.2),
+        inset 0 1px 2px rgba(255, 255, 255, 0.1);
+    transform: translateY(0);
+}
+
+.menu-btn-label {
+    display: block;
+    flex: 1;
+}
+
+.menu-btn-badge {
+    font-size: 0.7rem;
+    font-weight: 900;
+    opacity: 0.7;
+    letter-spacing: 0.1em;
+}
+
+/* Primary button - Play */
+.menu-btn-primary {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 50%, #1d4ed8 100%);
+    color: #ffffff;
+    grid-column: 1 / -1;
+    font-size: 1.3rem;
+    padding: 1.4rem 2rem;
+    box-shadow: 
+        0 12px 24px rgba(37, 99, 235, 0.35),
+        0 6px 12px rgba(0, 0, 0, 0.3),
+        inset 0 1px 2px rgba(255, 255, 255, 0.12);
+}
+
+.menu-btn-primary::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0) 50%);
+    border-radius: inherit;
+    opacity: 0;
+    transition: opacity 0.4s;
+}
+
+.menu-btn-primary:hover:not(:disabled) {
+    background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 50%, #2563eb 100%);
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 
+        0 16px 32px rgba(37, 99, 235, 0.45),
+        0 8px 16px rgba(0, 0, 0, 0.4),
+        0 0 24px rgba(59, 130, 246, 0.4),
+        inset 0 1px 2px rgba(255, 255, 255, 0.15);
+}
+
+.menu-btn-primary:active:not(:disabled) {
+    transform: translateY(-1px) scale(1.02);
+    box-shadow: 
+        0 4px 8px rgba(37, 99, 235, 0.25),
+        0 2px 4px rgba(0, 0, 0, 0.2),
+        inset 0 -2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Secondary buttons - Multiplayer (Create Room, Join Room) */
+.menu-btn-secondary {
+    background: linear-gradient(135deg, #475569 0%, #334155 50%, #1e293b 100%);
+    color: #cbd5e1;
+    font-size: 1rem;
+    padding: 1rem 1.2rem;
+    box-shadow: 
+        0 8px 16px rgba(0, 0, 0, 0.35),
+        0 4px 8px rgba(0, 0, 0, 0.2),
+        inset 0 1px 2px rgba(255, 255, 255, 0.06);
+}
+
+.menu-btn-secondary:hover:not(:disabled) {
+    background: linear-gradient(135deg, #64748b 0%, #475569 50%, #334155 100%);
+    transform: translateY(-2px) scale(1.04);
+    box-shadow: 
+        0 12px 20px rgba(0, 0, 0, 0.4),
+        0 6px 12px rgba(0, 0, 0, 0.3),
+        0 0 16px rgba(100, 116, 139, 0.25),
+        inset 0 1px 2px rgba(255, 255, 255, 0.08);
+    color: #e2e8f0;
+}
+
+.menu-btn-secondary:active:not(:disabled) {
+    transform: translateY(0) scale(1.01);
+    box-shadow: 
+        0 4px 8px rgba(0, 0, 0, 0.25),
+        0 2px 4px rgba(0, 0, 0, 0.15),
+        inset 0 -2px 4px rgba(0, 0, 0, 0.15);
+}
+
+/* Disabled button styling */
+.menu-btn-disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    background: linear-gradient(135deg, #334155 0%, #1e293b 50%, #0f172a 100%) !important;
+    color: #64748b !important;
+}
+
+.menu-btn-disabled:hover {
+    transform: translateY(0) !important;
+    box-shadow: 
+        0 6px 12px rgba(0, 0, 0, 0.3),
+        inset 0 1px 2px rgba(255, 255, 255, 0.04) !important;
+}
+
+.menu-btn-disabled:active {
+    transform: translateY(0) !important;
+}
+
+/* Sound toggle - top corner */
+.menu-footer {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid rgba(148, 163, 184, 0.15);
+}
+
+.menu-sound-toggle {
+    background: rgba(71, 85, 105, 0.4);
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    color: #94a3b8;
+    padding: 0.75rem 1.25rem;
+    border-radius: 0.75rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.25s ease;
+    font-family: 'Poppins', sans-serif;
+}
+
+.menu-sound-toggle:hover {
+    background: rgba(100, 116, 139, 0.5);
+    border-color: rgba(148, 163, 184, 0.4);
+    color: #cbd5e1;
+    transform: translateY(-2px);
+}
+
+.menu-sound-toggle:active {
+    transform: translateY(0);
+}
+
+/* ==========================================================================
+   MENU ANIMATIONS
+   ========================================================================== */
+
+@keyframes menu-fade-in {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes menu-slide-down {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes menu-gradient-shift {
+    0%, 100% {
+        background: 
+            radial-gradient(circle at 20% 50%, rgba(6, 182, 212, 0.08) 0%, transparent 50%),
+            radial-gradient(circle at 80% 50%, rgba(59, 130, 246, 0.08) 0%, transparent 50%),
+            radial-gradient(circle at 50% 50%, rgba(34, 211, 153, 0.04) 0%, transparent 60%);
+    }
+    50% {
+        background: 
+            radial-gradient(circle at 30% 60%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
+            radial-gradient(circle at 70% 40%, rgba(34, 211, 153, 0.08) 0%, transparent 50%),
+            radial-gradient(circle at 50% 50%, rgba(6, 182, 212, 0.05) 0%, transparent 60%);
+    }
+}
+
+/* Button stagger animation */
+.menu-btn {
+    animation: menu-fade-in 0.6s ease-out forwards;
+    opacity: 0;
+}
+
+.menu-btn-primary {
+    animation-delay: 0.6s;
+}
+
+.menu-multiplayer-group .menu-btn:first-child {
+    animation-delay: 0.75s;
+}
+
+.menu-multiplayer-group .menu-btn:last-child {
+    animation-delay: 0.9s;
+}
+
+.menu-footer {
+    animation: menu-fade-in 0.6s ease-out forwards;
+    animation-delay: 1.05s;
+    opacity: 0;
+}
+
+/* Icon styling in menu */
+#icon-solo-menu,
+#icon-multi-menu,
+#icon-create-room,
+#icon-join-room {
+    width: 1.5rem;
+    height: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+@media (max-width: 640px) {
+    .menu-title {
+        font-size: 3.5rem;
+    }
+
+    .menu-subtitle {
+        font-size: 0.95rem;
+    }
+
+    .menu-container {
+        padding: 3rem 2rem;
+        gap: 1.5rem;
+    }
+
+    .menu-multiplayer-group {
+        grid-template-columns: 1fr;
+    }
+
+    .menu-btn {
+        font-size: 1rem;
+        padding: 1rem 1.2rem;
+    }
+
+    .menu-btn-primary {
+        font-size: 1.1rem;
+        padding: 1.2rem 1.5rem;
+    }
+}
 @keyframes flash { 
     0% { background-color: rgba(168, 85, 247, 0.4); box-shadow: 0 0 20px rgba(168, 85, 247, 0.5); } 
     100% { background-color: transparent; box-shadow: none; } 

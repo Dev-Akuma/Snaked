@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Snaked - Board Game</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Game-like title and clean playful body -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Poppins:wght@300;400;600;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/styles.css">
 </head>
 <body class="bg-slate-900 text-slate-200 font-sans h-screen overflow-hidden selection:bg-emerald-500/30 relative">
@@ -16,26 +18,63 @@
          SCREEN 1: MAIN MENU
          ========================================================================== -->
     <div id="screen-main-menu" class="screen items-center justify-center z-20">
-        <div class="bg-slate-800/80 backdrop-blur-xl p-10 rounded-3xl border border-slate-700/80 max-w-lg w-full text-center relative overflow-hidden panel-3d ring-1 ring-white/10">
-            <div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400"></div>
-            
-            <h1 class="text-6xl font-black tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-400 drop-shadow-xl mb-2">SNAKED</h1>
-            <p class="text-slate-400 font-medium tracking-widest uppercase text-[10px] sm:text-xs mb-10 letter-spacing-2">Not Your Typical Snake & Ladder</p>
-            
-            <div class="flex flex-col gap-5">
-                <button onclick="openSettings('solo')" class="btn-3d w-full bg-gradient-to-b from-blue-500 to-blue-600 hover:from-blue-400 hover:to-blue-500 text-white font-black py-4 px-6 rounded-xl border-blue-800 shadow-lg text-xl tracking-wider flex items-center justify-center gap-3">
-                    <span id="icon-solo-menu"></span> Solo Mode
+        <!-- Dynamic animated background (blurred board effect) -->
+        <div class="menu-bg-overlay"></div>
+
+        <!-- Menu container -->
+        <div class="menu-container">
+            <!-- Header: Title and Subtitle -->
+            <div class="menu-header">
+                <h1 class="menu-title" style="font-family: 'Orbitron', sans-serif;">SNAKED</h1>
+                <p class="menu-subtitle" style="font-family: 'Poppins', sans-serif;">Not the Ordinary Snake & Ladder</p>
+            </div>
+
+            <!-- Button Group -->
+            <div class="menu-button-group">
+                <!-- Primary: Play Button -->
+                <button 
+                    onclick="AudioSys.menuClick(); openSettings('solo')" 
+                    onmouseover="AudioSys.menuHover()"
+                    class="menu-btn menu-btn-primary">
+                    <span id="icon-solo-menu"></span>
+                    <span class="menu-btn-label">Play</span>
                 </button>
-                
-                <button onclick="openSettings('passplay')" class="btn-3d w-full bg-gradient-to-b from-slate-700 to-slate-800 hover:from-slate-600 hover:to-slate-700 text-white font-bold py-4 px-6 rounded-xl border-slate-900 shadow-lg text-lg tracking-wider flex items-center justify-center gap-3">
-                    <span id="icon-multi-menu"></span> Pass & Play
-                </button>
-                
-                <div class="mt-4 pt-4 border-t border-slate-700/50 flex justify-center">
-                    <button onclick="AudioSys.toggleMute()" id="btn-mute-main" class="text-slate-400 hover:text-white transition-colors flex items-center gap-2 font-semibold text-sm">
-                        <!-- Injected via JS -->
+
+                <!-- Divider -->
+                <div class="menu-button-divider"></div>
+
+                <!-- Multiplayer buttons (disabled for future) -->
+                <div class="menu-multiplayer-group">
+                    <button 
+                        disabled 
+                        onmouseover="AudioSys.menuHover()"
+                        class="menu-btn menu-btn-secondary menu-btn-disabled"
+                        title="Coming Soon">
+                        <span id="icon-create-room"></span>
+                        <span class="menu-btn-label">Create Room</span>
+                        <span class="menu-btn-badge" style="font-family: 'Poppins', sans-serif;">Soon</span>
+                    </button>
+
+                    <button 
+                        disabled 
+                        onmouseover="AudioSys.menuHover()"
+                        class="menu-btn menu-btn-secondary menu-btn-disabled"
+                        title="Coming Soon">
+                        <span id="icon-join-room"></span>
+                        <span class="menu-btn-label">Join Room</span>
+                        <span class="menu-btn-badge" style="font-family: 'Poppins', sans-serif;">Soon</span>
                     </button>
                 </div>
+            </div>
+
+            <!-- Sound toggle (bottom) -->
+            <div class="menu-footer">
+                <button 
+                    onclick="AudioSys.toggleMute()" 
+                    id="btn-mute-main" 
+                    class="menu-sound-toggle">
+                    <!-- Injected via JS -->
+                </button>
             </div>
         </div>
     </div>

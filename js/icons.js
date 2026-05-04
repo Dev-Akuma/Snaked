@@ -30,16 +30,23 @@ const ICONS = {
     star: `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>`,
     x: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`,
     roulette: `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polygon points="12 2 12 12 19.07 4.93"></polygon></svg>`,
-    leaderboard: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20v-8"/><path d="M6 20V4"/><path d="M18 20v-4"/></svg>`
+    leaderboard: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20v-8"/><path d="M6 20V4"/><path d="M18 20v-4"/></svg>`,
+    plus: `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>`,
+    signIn: `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path><polyline points="10 17 15 12 10 7"></polyline><line x1="15" y1="12" x2="3" y2="12"></line></svg>`
 };
 
 // Initialize icons on DOM load
 document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('icon-solo-menu').innerHTML = ICONS.user;
-    document.getElementById('icon-multi-menu').innerHTML = ICONS.users;
-    document.getElementById('icon-trophy').innerHTML = ICONS.trophy;
-    document.getElementById('icon-btn-roll').innerHTML = ICONS.diceSmall;
-    document.getElementById('icon-resume').innerHTML = ICONS.resume;
-    document.getElementById('dice-display').innerHTML = ICONS.dice;
-    document.getElementById('icon-leaderboard-header').innerHTML = ICONS.leaderboard;
+    // Menu icons
+    if (document.getElementById('icon-solo-menu')) document.getElementById('icon-solo-menu').innerHTML = ICONS.user;
+    if (document.getElementById('icon-multi-menu')) document.getElementById('icon-multi-menu').innerHTML = ICONS.users;
+    if (document.getElementById('icon-create-room')) document.getElementById('icon-create-room').innerHTML = ICONS.plus;
+    if (document.getElementById('icon-join-room')) document.getElementById('icon-join-room').innerHTML = ICONS.signIn;
+    
+    // Game screen icons (may not exist on menu screen)
+    if (document.getElementById('icon-trophy')) document.getElementById('icon-trophy').innerHTML = ICONS.trophy;
+    if (document.getElementById('icon-btn-roll')) document.getElementById('icon-btn-roll').innerHTML = ICONS.diceSmall;
+    if (document.getElementById('icon-resume')) document.getElementById('icon-resume').innerHTML = ICONS.resume;
+    if (document.getElementById('dice-display')) document.getElementById('dice-display').innerHTML = ICONS.dice;
+    if (document.getElementById('icon-leaderboard-header')) document.getElementById('icon-leaderboard-header').innerHTML = ICONS.leaderboard;
 });

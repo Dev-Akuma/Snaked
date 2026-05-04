@@ -57,6 +57,10 @@ const AudioSys = {
     powerup() { this.playTone(800, 'sine', 0.3, 0.1, 1200); },
     win() { [400, 500, 600, 800, 1000, 1200].forEach((f, i) => setTimeout(() => this.playTone(f, 'square', 0.2, 0.05), i * 150)); },
     
+    // Menu-specific sounds
+    menuHover() { this.playTone(700, 'sine', 0.08, 0.04); },
+    menuClick() { this.playTone(500, 'square', 0.12, 0.08, 350); },
+    
     startBGM() {
         this.init();
         if (this.bgmOsc) return;
