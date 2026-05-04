@@ -6,7 +6,7 @@
 
 // Default config
 const defaultGameConfig = {
-    gameTime: 0, // seconds, 0 = no limit
+    gameTime: 300, // seconds, 0 = no limit
     turnTime: 10, // seconds, 0 = no limit
     players: [ { type: 'human' }, { type: 'human' } ], // default 2 humans
     enabledPowerups: [...POWERUPS] // by default all enabled

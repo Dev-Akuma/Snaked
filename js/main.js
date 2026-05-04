@@ -21,7 +21,7 @@ function initGame(modeOrConfig) {
         if (modeOrConfig === 'passplay') {
             const humanCount = parseInt(document.getElementById('pp-player-count').value || '2', 10);
             cfg = {
-                gameTime: 0,
+                gameTime: 300,
                 turnTime: 10,
                 players: Array.from({ length: humanCount }, () => ({ type: 'human' })),
                 enabledPowerups: [...POWERUPS]
@@ -31,7 +31,7 @@ function initGame(modeOrConfig) {
             const botCount = parseInt(document.getElementById('solo-bot-count').value || '1', 10);
             const players = [{ type: 'human' }];
             for (let i = 0; i < botCount; i++) players.push({ type: 'cpu' });
-            cfg = { gameTime: 0, turnTime: 10, players, enabledPowerups: [...POWERUPS] };
+            cfg = { gameTime: 300, turnTime: 10, players, enabledPowerups: [...POWERUPS] };
         }
     }
 
@@ -166,12 +166,17 @@ function clearTurnTimer() {
 function startGameTimer() {
     // global game timer (leader wins on expiry)
     clearGameTimer();
-    if (!state.gameConfig || !state.gameConfig.gameTime || state.gameConfig.gameTime <= 0) return;
+    if (!state.gameConfig || !state.gameConfig.gameTime || state.gameConfig.gameTime <= 0) {
+        updateGlobalTimerDisplay(true);
+        return;
+    }
     state.gameTimeRemaining = state.gameConfig.gameTime;
+    updateGlobalTimerDisplay();
     gameTimerInterval = setInterval(() => {
         if (state.isPaused || state.isAnimating || state.status !== 'playing') return;
         state.gameTimeRemaining--;
-        // Optionally expose somewhere in UI via updateUI()
+        updateGlobalTimerDisplay();
+        
         if (state.gameTimeRemaining <= 0) {
             clearGameTimer();
             // Determine leader (highest position, tie-breaker by position then id)
@@ -185,4 +190,5 @@ function clearGameTimer() {
     if (gameTimerInterval) clearInterval(gameTimerInterval);
     gameTimerInterval = null;
     state.gameTimeRemaining = null;
+    updateGlobalTimerDisplay(true);
 }

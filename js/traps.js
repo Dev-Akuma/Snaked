@@ -27,6 +27,13 @@ function isValidTrapTile(tileNum, trapType) {
     }
     
     // ===== TRAP PLACEMENT RESTRICTIONS =====
+    const { boardRow, boardCol } = getTilePosition(tileNum);
+    
+    if (trapType === 'left_tile' && boardCol === 0) return false;
+    if (trapType === 'right_tile' && boardCol === 9) return false;
+    if ((trapType === 'down_tile' || trapType === 'down_snake') && boardRow === 0) return false;
+    if (trapType === 'up_tile' && boardRow === 9) return false;
+
     // Disallow placement on snake heads (snake START tiles)
     if (SNAKES.hasOwnProperty(tileNum)) {
         return false; // Cannot place trap on tile with snake head

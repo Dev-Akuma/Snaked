@@ -301,6 +301,31 @@ function updateTimerDisplay(forceClear = false) {
     });
 }
 
+function updateGlobalTimerDisplay(forceClear = false) {
+    const container = document.getElementById('global-timer');
+    const textEl = document.getElementById('global-timer-text');
+    if (!container || !textEl) return;
+    
+    if (forceClear || state.gameTimeRemaining == null) {
+        container.classList.add('hidden');
+        return;
+    }
+    
+    container.classList.remove('hidden');
+    
+    const m = Math.floor(state.gameTimeRemaining / 60);
+    const s = state.gameTimeRemaining % 60;
+    textEl.innerText = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+    
+    if (state.gameTimeRemaining <= 30) {
+        textEl.className = 'text-red-400 animate-pulse font-black';
+    } else if (state.gameTimeRemaining <= 60) {
+        textEl.className = 'text-orange-400 font-bold';
+    } else {
+        textEl.className = 'text-slate-300';
+    }
+}
+
 function logMessage(msg, customClass = '') {
     const entry = document.createElement('div');
     entry.className = `border-b border-slate-700/50 pb-1.5 ${customClass}`;

@@ -257,8 +257,7 @@ function getTileUp(tile) {
  */
 function getTileLeft(tile) {
     const { boardRow, boardCol } = getTilePosition(tile);
-    const isReverseRow = boardRow % 2 === 1;
-    const newCol = isReverseRow ? boardCol + 1 : boardCol - 1;
+    const newCol = boardCol - 1;
     if (newCol < 0 || newCol > 9) return tile; // At edge, stay
     return getTileFromBoardPosition(boardRow, newCol);
 }
@@ -271,8 +270,7 @@ function getTileLeft(tile) {
  */
 function getTileRight(tile) {
     const { boardRow, boardCol } = getTilePosition(tile);
-    const isReverseRow = boardRow % 2 === 1;
-    const newCol = isReverseRow ? boardCol - 1 : boardCol + 1;
+    const newCol = boardCol + 1;
     if (newCol < 0 || newCol > 9) return tile; // At edge, stay
     return getTileFromBoardPosition(boardRow, newCol);
 }

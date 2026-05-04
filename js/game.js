@@ -172,6 +172,8 @@ async function resolveCascadesVisually(cp) {
         // ===== TILE EFFECT SYSTEM =====
         if (state.tileEffects[currentPos]) {
             const effect = state.tileEffects[currentPos];
+            delete state.tileEffects[currentPos];
+            state.trapCooldowns[currentPos] = state.turnCounter + state.players.length;
             let newPos = currentPos;
             
             if (effect.type === 'up') {
