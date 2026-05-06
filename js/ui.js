@@ -19,7 +19,7 @@ function updateUI() {
 }
 
 function updateControlStates(cp) {
-    if (state.isAnimating || state.isPaused) {
+    if (state.isAwaitingHost || state.isAnimating || state.isPaused) {
         DOM.btnRoll.disabled = true;
         DOM.btnPowerup.disabled = true;
         return;

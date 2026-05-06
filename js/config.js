@@ -38,7 +38,7 @@ const TILE_EFFECT_TYPES = {
 };
 
 const TILE_EFFECT_POWERUPS = ['up_tile', 'down_tile', 'left_tile', 'right_tile', 'freeze_tile'];
-const POWERUPS = ['bear_trap', 'dry_ice', 'double_dice', 'switch_up', ...TILE_EFFECT_POWERUPS];
+const POWERUPS = ['bear_trap', 'double_dice', 'switch_up', ...TILE_EFFECT_POWERUPS];
 
 const TILE_EFFECT_POWERUP_TO_TYPE = {
     up_tile: TILE_EFFECT_TYPES.UP,
@@ -64,7 +64,6 @@ const delay = ms => new Promise(res => setTimeout(res, ms));
 
 function formatPowerupName(key) {
     if (key === 'bear_trap') return 'Bear Trap';
-    if (key === 'dry_ice') return 'Dry Ice';
     if (key === 'down_tile') return 'Down Tile';
     if (key === 'double_dice') return '2x Dice';
     if (key === 'switch_up') return 'Switch';
@@ -77,7 +76,6 @@ function formatPowerupName(key) {
 
 function getPowerupIcon(key) {
     if (key === 'bear_trap') return ICONS.trap;
-    if (key === 'dry_ice') return ICONS.ice;
     if (key === 'double_dice') return ICONS.doubleDice;
     if (key === 'switch_up') return ICONS.switch;
     if (key === 'up_tile') return `<span class="inline-block w-4 h-4">${ICONS.upTile}</span>`;

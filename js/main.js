@@ -136,22 +136,33 @@ function startTurnTimer() {
         return;
     }
 
-    state.timeRemaining = turnLimit;
-    updateTimerDisplay();
+    if (!state.turnStartTime) state.turnStartTime = Date.now();
 
     turnTimerInterval = setInterval(() => {
-        if (state.isPaused || state.isAnimating) return;
-        state.timeRemaining--;
+        if (state.isPaused || state.isAnimating) {
+            state.turnStartTime += 1000; // shift forward so timer doesn't count down while paused
+            return;
+        }
+        
+        let elapsed = Math.floor((Date.now() - state.turnStartTime) / 1000);
+        state.timeRemaining = turnLimit - elapsed;
+        
+        if (state.timeRemaining < 0) state.timeRemaining = 0;
         updateTimerDisplay();
 
         if (state.timeRemaining <= 0) {
             clearTurnTimer();
-            if (state.status === 'trap_placement') {
-                state.status = 'playing';
-                updateUI();
-                setTimeout(() => handleRollClick(), 100);
+            if (typeof Network !== 'undefined' && Network.roomId && !Network.isHost) {
+                // Clients do nothing. Just wait for Host to auto-roll.
             } else {
-                handleRollClick();
+                // Host or Offline
+                if (state.status === 'trap_placement') {
+                    state.status = 'playing';
+                    updateUI();
+                    setTimeout(() => handleRollClick(), 100);
+                } else {
+                    handleRollClick();
+                }
             }
         }
     }, 1000);

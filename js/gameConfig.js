@@ -12,6 +12,17 @@ const defaultGameConfig = {
     enabledPowerups: [...POWERUPS] // by default all enabled
 };
 
+const POWERUP_DESCRIPTIONS = {
+    bear_trap: 'Places a bear trap on the board. The next player who lands there loses their turn.',
+    double_dice: 'Gives the player an extra dice roll for a faster burst of movement.',
+    switch_up: 'Swaps player positions and can completely reshape the race.',
+    up_tile: 'Launches a player forward to a higher tile when triggered.',
+    down_tile: 'Drops a player backward to a lower tile when triggered.',
+    left_tile: 'Moves a player sideways to the left on the board.',
+    right_tile: 'Moves a player sideways to the right on the board.',
+    freeze_tile: 'Freezes the player in place and skips their next movement.'
+};
+
 function openSettings(mode) {
     // mode is 'solo' or 'passplay' or undefined
     navTo('screen-game-settings');
@@ -33,6 +44,21 @@ function renderSettingsUI(mode) {
     const turnTimeEl = document.getElementById('cfg-turn-time');
     const slotsEl = document.getElementById('cfg-player-slots');
     const powerupsEl = document.getElementById('cfg-powerups');
+    const powerupTooltipEl = document.getElementById('cfg-powerup-tooltip');
+
+    const showPowerupTooltip = (title, description) => {
+        if (!powerupTooltipEl) return;
+        powerupTooltipEl.innerHTML = `<div class="text-[10px] uppercase tracking-[0.2em] text-orange-300 font-black mb-1">${title}</div><div>${description}</div>`;
+        powerupTooltipEl.classList.remove('hidden');
+        powerupTooltipEl.classList.add('visible');
+    };
+
+    const hidePowerupTooltip = () => {
+        if (!powerupTooltipEl) return;
+        powerupTooltipEl.classList.remove('visible');
+        powerupTooltipEl.classList.add('hidden');
+        powerupTooltipEl.innerHTML = '';
+    };
 
     if (mode === 'solo') {
         cfg.players = [ { type: 'human', color: PLAYER_COLORS[0] }, { type: 'cpu', color: PLAYER_COLORS[1] } ];
@@ -130,8 +156,11 @@ function renderSettingsUI(mode) {
         powerupsEl.innerHTML = '';
         POWERUPS.forEach(p => {
             const isEnabled = cfg.enabledPowerups.includes(p);
+            const powerupName = formatPowerupName(p);
+            const powerupDescription = POWERUP_DESCRIPTIONS[p] || 'Toggles a gameplay modifier during match setup.';
             const card = document.createElement('div');
             card.className = `cursor-pointer flex flex-col items-center justify-center gap-2 p-3 rounded-xl border-2 transition-all select-none ${isEnabled ? 'bg-slate-800 border-purple-500 shadow-[0_0_15px_rgba(168,85,247,0.2)]' : 'bg-slate-950/50 border-slate-800/50 opacity-40 hover:opacity-70'}`;
+            card.title = `${powerupName}: ${powerupDescription}`;
             
             // Make SVG slightly bigger
             let iconMarkup = getPowerupIcon(p);
@@ -139,8 +168,13 @@ function renderSettingsUI(mode) {
             
             card.innerHTML = `
                 <div class="${isEnabled ? 'text-purple-400' : 'text-slate-500'} flex items-center justify-center h-8">${iconMarkup}</div>
-                <span class="text-[10px] sm:text-xs font-black text-center uppercase tracking-wider ${isEnabled ? 'text-slate-200' : 'text-slate-500'}">${formatPowerupName(p)}</span>
+                <span class="text-[10px] sm:text-xs font-black text-center uppercase tracking-wider ${isEnabled ? 'text-slate-200' : 'text-slate-500'}">${powerupName}</span>
             `;
+            card.addEventListener('mouseenter', () => showPowerupTooltip(powerupName, powerupDescription));
+            card.addEventListener('focus', () => showPowerupTooltip(powerupName, powerupDescription));
+            card.addEventListener('mousemove', () => showPowerupTooltip(powerupName, powerupDescription));
+            card.addEventListener('mouseleave', hidePowerupTooltip);
+            card.addEventListener('blur', hidePowerupTooltip);
             card.onclick = () => {
                 if (isEnabled) cfg.enabledPowerups = cfg.enabledPowerups.filter(x => x !== p);
                 else cfg.enabledPowerups.push(p);

@@ -3,12 +3,28 @@
    ========================================================================== */
 
 function handleRollClick() {
-    if (typeof Network !== 'undefined' && Network.roomId && state.currentPlayerIndex !== Network.playerId) {
-        logMessage(`<span class="log-icon text-red-500">${ICONS.x}</span> Not your turn!`, 'text-red-400');
-        return;
+    if (state.isAwaitingHost || state.isAnimating || state.status !== 'playing' || state.isPaused) return;
+    
+    if (typeof Network !== 'undefined' && Network.roomId) {
+        if (state.currentPlayerIndex !== Network.playerId) {
+            logMessage(`<span class="log-icon text-red-500">${ICONS.x}</span> Not your turn!`, 'text-red-400');
+            return;
+        }
+        state.isAwaitingHost = true;
+        updateUI(); // Disables button
+        Network.broadcastEvent({ type: 'REQUEST_ROLL', playerIndex: Network.playerId });
+    } else {
+        // Offline play
+        let roll1 = Math.floor(Math.random() * 6) + 1;
+        let roll2 = state.activeEffects.doubleDice ? Math.floor(Math.random() * 6) + 1 : null;
+        
+        const pool = (state.gameConfig && Array.isArray(state.gameConfig.enabledPowerups) && state.gameConfig.enabledPowerups.length)
+            ? state.gameConfig.enabledPowerups
+            : ['bear_trap', 'dry_ice', 'switch_up', 'double_dice', 'up_snake_tile', 'down_ladder_tile'];
+        const rouletteReward = pool[Math.floor(Math.random() * pool.length)];
+        
+        executeRoll(roll1, roll2, rouletteReward);
     }
-    clearTurnTimer();
-    if (!state.isAnimating && state.status === 'playing' && !state.isPaused) rollDice();
 }
 
 async function animateDiceRoll(finalVal, totalSoFar, isSecondRoll) {
@@ -47,25 +63,23 @@ async function stepMovePlayer(player, targetPos, stepDelay = 150) {
     }
 }
 
-async function rollDice() {
+async function executeRoll(roll1, roll2, rouletteReward) {
     const cp = state.players[state.currentPlayerIndex];
     state.isAnimating = true;
+    state.isAwaitingHost = false;
     clearTurnTimer(); 
     updateControlStates(cp);
     
-    let isDouble = state.activeEffects.doubleDice;
+    let isDouble = roll2 !== null;
     state.activeEffects.doubleDice = false; 
     
-    let roll1 = Math.floor(Math.random() * 6) + 1;
     let totalRoll = roll1;
-    
     let logMsg = `<span class="log-icon text-slate-300">${ICONS.diceSmall}</span> <span style="color: ${cp.color.hex}; font-weight: bold;">${cp.name}</span> rolled ${roll1}`;
     
     await animateDiceRoll(roll1, totalRoll, false);
     
     if (isDouble) {
         await delay(500); 
-        let roll2 = Math.floor(Math.random() * 6) + 1;
         totalRoll += roll2;
         logMsg += ` & ${roll2} <span class="text-purple-400 font-bold">(Tot: ${totalRoll})</span>`;
         await animateDiceRoll(roll2, totalRoll, true);
@@ -88,7 +102,7 @@ async function rollDice() {
         
         if (cp.luck >= 6) {
             await delay(400); 
-            await triggerRoulette(cp);
+            await triggerRoulette(cp, rouletteReward);
         }
 
         state.isAnimating = false;
@@ -108,7 +122,7 @@ async function rollDice() {
 
     if (cp.luck >= 6) {
         await delay(400); 
-        await triggerRoulette(cp);
+        await triggerRoulette(cp, rouletteReward);
     }
 
     state.isAnimating = false;
@@ -245,12 +259,12 @@ async function resolveCascadesVisually(cp) {
     }
 }
 
-async function triggerRoulette(player) {
+async function triggerRoulette(player, forcedReward = null) {
     player.luck = 0; 
     const pool = (state.gameConfig && Array.isArray(state.gameConfig.enabledPowerups) && state.gameConfig.enabledPowerups.length)
         ? state.gameConfig.enabledPowerups
-        : POWERUPS;
-    const gained = pool[Math.floor(Math.random() * pool.length)];
+        : ['bear_trap', 'dry_ice', 'switch_up', 'double_dice', 'up_snake_tile', 'down_ladder_tile'];
+    const gained = forcedReward || pool[Math.floor(Math.random() * pool.length)];
     player.powerup = gained; 
     AudioSys.powerup();
     
@@ -267,81 +281,103 @@ async function triggerRoulette(player) {
 }
 
 async function usePowerup() {
-    if (state.isAnimating || state.isPaused) return;
+    if (state.isAwaitingHost || state.isAnimating || state.isPaused) return;
     const cp = state.players[state.currentPlayerIndex];
 
-    if (typeof Network !== 'undefined' && Network.roomId && state.currentPlayerIndex !== Network.playerId) {
-        return;
+    if (typeof Network !== 'undefined' && Network.roomId) {
+        if (state.currentPlayerIndex !== Network.playerId) return;
     }
     
     if (state.status === 'trap_placement') {
         state.status = 'playing';
         updateUI();
-        startTurnTimer(); 
+        if (!cp.isBot && state.gameConfig.turnTime > 0) startTurnTimer(); // Wait, let's just let it stay on turn timer
         return;
     }
 
     if (!cp.powerup) return;
 
-    if (cp.powerup === 'double_dice') {
-        state.activeEffects.doubleDice = true;
-        cp.powerup = null;
-        logMessage(`<span class="log-icon text-purple-400">${ICONS.doubleDice}</span> ${cp.name} used <strong>Double Dice!</strong>`, 'text-purple-400');
-        updateUI();
-        startTurnTimer();
-    } 
-    else if (['bear_trap', 'dry_ice'].includes(cp.powerup) || isTileEffectPowerup(cp.powerup)) {
+    if (['bear_trap', 'dry_ice'].includes(cp.powerup) || isTileEffectPowerup(cp.powerup)) {
         state.status = 'trap_placement';
         updateUI();
+        return;
     }
-    else if (cp.powerup === 'switch_up') {
-        clearTurnTimer(); 
-        state.isAnimating = true; updateUI();
-        const opponents = state.players.filter(p => p.id !== cp.id);
-        const target = opponents[Math.floor(Math.random() * opponents.length)];
-        
-        logMessage(`<span class="log-icon text-purple-400">${ICONS.switch}</span> <strong>Switch-Up!</strong> Swapping with ${target.name}...`, 'text-purple-400');
-        AudioSys.powerup();
-        await delay(800); 
-        
-        const tempPos = cp.position; cp.position = target.position; target.position = tempPos;
-        cp.powerup = null; updateUI();
-        await delay(500);
-        
-        state.isAnimating = false; updateUI();
-        startTurnTimer(); 
+    
+    // For double_dice and switch_up, we request immediately
+    if (typeof Network !== 'undefined' && Network.roomId) {
+        state.isAwaitingHost = true;
+        updateUI();
+        Network.broadcastEvent({ type: 'REQUEST_POWERUP', playerIndex: Network.playerId, tileIndex: null, powerupType: cp.powerup });
+    } else {
+        // Offline
+        if (cp.powerup === 'switch_up') {
+            const opponents = state.players.filter(p => p.id !== cp.id);
+            const target = opponents[Math.floor(Math.random() * opponents.length)];
+            executePowerup(null, cp.powerup, target ? target.id : null);
+        } else {
+            executePowerup(null, cp.powerup);
+        }
     }
 }
 
 function handleTileClick(tileNum) {
-    if (state.status !== 'trap_placement' || state.isAnimating || state.isPaused) return;
+    if (state.status !== 'trap_placement' || state.isAwaitingHost || state.isAnimating || state.isPaused) return;
     const cp = state.players[state.currentPlayerIndex];
     
     if (isValidTrapTile(tileNum, cp.powerup)) {
-        clearTurnTimer(); 
-        
-        if (isTileEffectPowerup(cp.powerup)) {
-            state.tileEffects[tileNum] = { type: getTileEffectTypeFromPowerup(cp.powerup) };
-            logMessage(`<span class="log-icon text-emerald-400">${getPowerupIcon(cp.powerup)}</span> ${cp.name} set ${formatPowerupName(cp.powerup)} on <strong>${tileNum}</strong>.`);
+        if (typeof Network !== 'undefined' && Network.roomId) {
+            state.isAwaitingHost = true;
+            updateUI();
+            Network.broadcastEvent({ type: 'REQUEST_POWERUP', playerIndex: Network.playerId, tileIndex: tileNum, powerupType: cp.powerup });
         } else {
-            state.traps[tileNum] = { type: cp.powerup, strength: 0 };
-            logMessage(`<span class="log-icon text-orange-500">${getPowerupIcon(cp.powerup)}</span> ${cp.name} set ${formatPowerupName(cp.powerup)} on <strong>${tileNum}</strong>.`);
+            executePowerup(tileNum, cp.powerup);
         }
-        
-        state.trapCooldowns[tileNum] = state.turnCounter + state.players.length;
-        cp.powerup = null; 
-        AudioSys.trap();
-        state.status = 'playing';
-        updateUI();
-        startTurnTimer(); 
     } else {
         if(!cp.isBot) logMessage(`<span class="log-icon text-red-500">${ICONS.x}</span> Invalid trap tile or cooldown active.`, 'text-red-400');
     }
 }
 
-async function processNextTurn() {
-    const previousPlayerIndex = state.currentPlayerIndex;
+async function executePowerup(tileIndex, powerupType, targetId = null) {
+    const cp = state.players[state.currentPlayerIndex];
+    state.isAwaitingHost = false;
     
+    if (powerupType === 'double_dice') {
+        state.activeEffects.doubleDice = true;
+        cp.powerup = null;
+        logMessage(`<span class="log-icon text-purple-400">${ICONS.doubleDice}</span> ${cp.name} used <strong>Double Dice!</strong>`, 'text-purple-400');
+        updateUI();
+    } 
+    else if (['bear_trap', 'dry_ice'].includes(powerupType) || isTileEffectPowerup(powerupType)) {
+        if (isTileEffectPowerup(powerupType)) {
+            state.tileEffects[tileIndex] = { type: getTileEffectTypeFromPowerup(powerupType) };
+            logMessage(`<span class="log-icon text-emerald-400">${getPowerupIcon(powerupType)}</span> ${cp.name} set ${formatPowerupName(powerupType)} on <strong>${tileIndex}</strong>.`);
+        } else {
+            state.traps[tileIndex] = { type: powerupType, strength: 0 };
+            logMessage(`<span class="log-icon text-orange-500">${getPowerupIcon(powerupType)}</span> ${cp.name} set ${formatPowerupName(powerupType)} on <strong>${tileIndex}</strong>.`);
+        }
+        state.trapCooldowns[tileIndex] = state.turnCounter + state.players.length;
+        cp.powerup = null; 
+        AudioSys.trap();
+        state.status = 'playing';
+        updateUI();
+    }
+    else if (powerupType === 'switch_up') {
+        state.isAnimating = true; updateUI();
+        const target = state.players.find(p => p.id === targetId);
+        if (target) {
+            logMessage(`<span class="log-icon text-purple-400">${ICONS.switch}</span> <strong>Switch-Up!</strong> Swapping with ${target.name}...`, 'text-purple-400');
+            AudioSys.powerup();
+            await delay(800); 
+            
+            const tempPos = cp.position; cp.position = target.position; target.position = tempPos;
+            cp.powerup = null; updateUI();
+            await delay(500);
+        }
+        state.isAnimating = false; updateUI();
+    }
+}
+
+async function processNextTurn() {
     state.turnCounter++;
     state.currentPlayerIndex = (state.currentPlayerIndex + 1) % state.players.length;
     
@@ -362,14 +398,31 @@ async function processNextTurn() {
     
     updateUI();
     
-    if (typeof Network !== 'undefined' && Network.roomId && previousPlayerIndex === Network.playerId) {
-        Network.syncState();
-    }
-    
-    if (nextPlayer.isBot) {
-        runBotSequence();
+    if (typeof Network !== 'undefined' && Network.roomId) {
+        if (Network.isHost) {
+            const startTime = Date.now();
+            Network.broadcastEvent({ type: 'TURN_START', startTime });
+            handleTurnStart(startTime);
+            Network.syncState(); // Snapshot
+        }
     } else {
         startTurnTimer();
+        if (nextPlayer.isBot && state.status === 'playing') {
+            runBotSequence();
+        }
+    }
+}
+
+function handleTurnStart(startTime) {
+    state.turnStartTime = startTime;
+    updateUI();
+    startTurnTimer();
+    
+    if (typeof Network !== 'undefined' && Network.roomId && Network.isHost) {
+        const cp = state.players[state.currentPlayerIndex];
+        if (cp.isBot && state.status === 'playing') {
+            runBotSequence();
+        }
     }
 }
 

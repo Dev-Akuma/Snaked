@@ -13,8 +13,10 @@ let state = {
     trapCooldowns: {},
     activeEffects: { doubleDice: false },
     isAnimating: false,
+    isAwaitingHost: false,
     isPaused: false,
-    timeRemaining: 10
+    timeRemaining: 10,
+    turnStartTime: null
 };
 
 let turnTimerInterval = null; 

@@ -8,6 +8,8 @@ const Network = {
     isHost: false,
     playerId: null, // local player index in state.players
     channel: null,
+    actionCounter: 0,
+    processedActions: new Set(),
     
     // Generate a random 6-character room code
     generateRoomCode: () => {
@@ -335,12 +337,99 @@ const Network = {
                     handleCancelRoom();
                 }
             })
+            .on('broadcast', { event: 'game_action' }, (payload) => {
+                Network.handleBroadcast(payload.payload);
+            })
             .subscribe();
+    },
+    
+    broadcastEvent: (payload) => {
+        if (!Network.channel) return;
+        Network.actionCounter++;
+        payload.actionId = Network.actionCounter;
+        payload.turnId = state.turnCounter;
+        Network.channel.send({
+            type: 'broadcast',
+            event: 'game_action',
+            payload: payload
+        });
+        // If Host, also process immediately
+        if (Network.isHost) {
+            Network.handleBroadcast(payload);
+        }
+    },
+    
+    handleBroadcast: (payload) => {
+        const uniqueId = `${payload.turnId}-${payload.actionId}`;
+        if (Network.processedActions.has(uniqueId)) return;
+        Network.processedActions.add(uniqueId);
+        
+        switch (payload.type) {
+            case 'REQUEST_ROLL':
+                if (Network.isHost) {
+                    if (state.currentPlayerIndex !== payload.playerIndex) {
+                        Network.broadcastEvent({ type: 'ACK_REJECTED', targetPlayer: payload.playerIndex, reason: "Not your turn" });
+                        return;
+                    }
+                    // Generate rolls and broadcast execute
+                    let roll1 = Math.floor(Math.random() * 6) + 1;
+                    let roll2 = state.activeEffects.doubleDice ? Math.floor(Math.random() * 6) + 1 : null;
+                    
+                    // Pre-generate roulette reward in case it's needed
+                    const pool = (state.gameConfig && Array.isArray(state.gameConfig.enabledPowerups) && state.gameConfig.enabledPowerups.length)
+                        ? state.gameConfig.enabledPowerups
+                        : ['bear_trap', 'dry_ice', 'switch_up', 'double_dice', 'up_snake_tile', 'down_ladder_tile']; // Default POWERUPS
+                    const rouletteReward = pool[Math.floor(Math.random() * pool.length)];
+                    
+                    Network.broadcastEvent({ type: 'EXECUTE_ROLL', roll1, roll2, rouletteReward });
+                }
+                break;
+                
+            case 'EXECUTE_ROLL':
+                state.isAwaitingHost = false;
+                if (typeof executeRoll === 'function') executeRoll(payload.roll1, payload.roll2, payload.rouletteReward);
+                break;
+                
+            case 'REQUEST_POWERUP':
+                if (Network.isHost) {
+                    if (state.currentPlayerIndex !== payload.playerIndex) {
+                        Network.broadcastEvent({ type: 'ACK_REJECTED', targetPlayer: payload.playerIndex, reason: "Not your turn" });
+                        return;
+                    }
+                    let targetId = null;
+                    if (payload.powerupType === 'switch_up') {
+                        const cp = state.players[state.currentPlayerIndex];
+                        const opponents = state.players.filter(p => p.id !== cp.id);
+                        if (opponents.length > 0) {
+                            targetId = opponents[Math.floor(Math.random() * opponents.length)].id;
+                        }
+                    }
+                    Network.broadcastEvent({ type: 'EXECUTE_POWERUP', tileIndex: payload.tileIndex, powerupType: payload.powerupType, targetId });
+                }
+                break;
+                
+            case 'EXECUTE_POWERUP':
+                state.isAwaitingHost = false;
+                if (typeof executePowerup === 'function') executePowerup(payload.tileIndex, payload.powerupType, payload.targetId);
+                break;
+                
+            case 'TURN_START':
+                if (typeof handleTurnStart === 'function') handleTurnStart(payload.startTime);
+                break;
+                
+            case 'ACK_REJECTED':
+                if (payload.targetPlayer === Network.playerId) {
+                    state.isAwaitingHost = false;
+                    console.warn("Request rejected by host:", payload.reason);
+                    updateUI();
+                }
+                break;
+        }
     },
 
     // Sync local state to Supabase (during game)
     syncState: async () => {
-        if (!Network.roomId || !db) return;
+        if (!Network.roomId || !db || !Network.isHost) return;
         const stateCopy = JSON.parse(JSON.stringify(state));
         await db.from('rooms').update({ game_state: stateCopy }).eq('id', Network.roomId);
     },
