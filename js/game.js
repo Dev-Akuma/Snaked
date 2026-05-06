@@ -2,29 +2,41 @@
    7. CORE GAMEPLAY LOGIC 
    ========================================================================== */
 
+// Helper: Check if game is in multiplayer mode
+function isMultiplayer() {
+    return typeof Network !== 'undefined' && Network.roomId;
+}
+
 function handleRollClick() {
     if (state.isAwaitingHost || state.isAnimating || state.status !== 'playing' || state.isPaused) return;
     
-    if (typeof Network !== 'undefined' && Network.roomId) {
-        if (state.currentPlayerIndex !== Network.playerId) {
-            logMessage(`<span class="log-icon text-red-500">${ICONS.x}</span> Not your turn!`, 'text-red-400');
-            return;
-        }
-        state.isAwaitingHost = true;
-        updateUI(); // Disables button
-        Network.broadcastEvent({ type: 'REQUEST_ROLL', playerIndex: Network.playerId });
+    if (isMultiplayer()) {
+        handleRollClickMultiplayer();
     } else {
-        // Offline play
-        let roll1 = Math.floor(Math.random() * 6) + 1;
-        let roll2 = state.activeEffects.doubleDice ? Math.floor(Math.random() * 6) + 1 : null;
-        
-        const pool = (state.gameConfig && Array.isArray(state.gameConfig.enabledPowerups) && state.gameConfig.enabledPowerups.length)
-            ? state.gameConfig.enabledPowerups
-            : ['bear_trap', 'dry_ice', 'switch_up', 'double_dice', 'up_snake_tile', 'down_ladder_tile'];
-        const rouletteReward = pool[Math.floor(Math.random() * pool.length)];
-        
-        executeRoll(roll1, roll2, rouletteReward);
+        handleRollClickOffline();
     }
+}
+
+function handleRollClickMultiplayer() {
+    if (state.currentPlayerIndex !== Network.playerId) {
+        logMessage(`<span class="log-icon text-red-500">${ICONS.x}</span> Not your turn!`, 'text-red-400');
+        return;
+    }
+    state.isAwaitingHost = true;
+    updateUI(); // Disables button
+    Network.broadcastEvent({ type: 'REQUEST_ROLL', playerIndex: Network.playerId });
+}
+
+function handleRollClickOffline() {
+    let roll1 = Math.floor(Math.random() * 6) + 1;
+    let roll2 = state.activeEffects.doubleDice ? Math.floor(Math.random() * 6) + 1 : null;
+    
+    const pool = (state.gameConfig && Array.isArray(state.gameConfig.enabledPowerups) && state.gameConfig.enabledPowerups.length)
+        ? state.gameConfig.enabledPowerups
+        : ['bear_trap', 'dry_ice', 'switch_up', 'double_dice', 'up_snake_tile', 'down_ladder_tile'];
+    const rouletteReward = pool[Math.floor(Math.random() * pool.length)];
+    
+    executeRoll(roll1, roll2, rouletteReward);
 }
 
 async function animateDiceRoll(finalVal, totalSoFar, isSecondRoll) {
@@ -284,14 +296,12 @@ async function usePowerup() {
     if (state.isAwaitingHost || state.isAnimating || state.isPaused) return;
     const cp = state.players[state.currentPlayerIndex];
 
-    if (typeof Network !== 'undefined' && Network.roomId) {
-        if (state.currentPlayerIndex !== Network.playerId) return;
-    }
+    if (isMultiplayer() && state.currentPlayerIndex !== Network.playerId) return;
     
     if (state.status === 'trap_placement') {
         state.status = 'playing';
         updateUI();
-        if (!cp.isBot && state.gameConfig.turnTime > 0) startTurnTimer(); // Wait, let's just let it stay on turn timer
+        if (!cp.isBot && state.gameConfig.turnTime > 0) startTurnTimer();
         return;
     }
 
@@ -303,20 +313,23 @@ async function usePowerup() {
         return;
     }
     
-    // For double_dice and switch_up, we request immediately
-    if (typeof Network !== 'undefined' && Network.roomId) {
+    // For double_dice and switch_up
+    if (isMultiplayer()) {
         state.isAwaitingHost = true;
         updateUI();
         Network.broadcastEvent({ type: 'REQUEST_POWERUP', playerIndex: Network.playerId, tileIndex: null, powerupType: cp.powerup });
     } else {
-        // Offline
-        if (cp.powerup === 'switch_up') {
-            const opponents = state.players.filter(p => p.id !== cp.id);
-            const target = opponents[Math.floor(Math.random() * opponents.length)];
-            executePowerup(null, cp.powerup, target ? target.id : null);
-        } else {
-            executePowerup(null, cp.powerup);
-        }
+        usePowerupOffline(cp);
+    }
+}
+
+function usePowerupOffline(cp) {
+    if (cp.powerup === 'switch_up') {
+        const opponents = state.players.filter(p => p.id !== cp.id);
+        const target = opponents[Math.floor(Math.random() * opponents.length)];
+        executePowerup(null, cp.powerup, target ? target.id : null);
+    } else {
+        executePowerup(null, cp.powerup);
     }
 }
 
@@ -325,7 +338,7 @@ function handleTileClick(tileNum) {
     const cp = state.players[state.currentPlayerIndex];
     
     if (isValidTrapTile(tileNum, cp.powerup)) {
-        if (typeof Network !== 'undefined' && Network.roomId) {
+        if (isMultiplayer()) {
             state.isAwaitingHost = true;
             updateUI();
             Network.broadcastEvent({ type: 'REQUEST_POWERUP', playerIndex: Network.playerId, tileIndex: tileNum, powerupType: cp.powerup });
@@ -398,19 +411,25 @@ async function processNextTurn() {
     
     updateUI();
     
-    if (typeof Network !== 'undefined' && Network.roomId) {
-        if (Network.isHost) {
-            const startTime = Date.now();
-            Network.broadcastEvent({ type: 'TURN_START', startTime });
-            handleTurnStart(startTime);
-            Network.syncState(); // Snapshot
-        }
+    if (isMultiplayer()) {
+        processNextTurnMultiplayer();
     } else {
-        startTurnTimer();
-        if (nextPlayer.isBot && state.status === 'playing') {
-            runBotSequence();
-        }
+        processNextTurnOffline();
     }
+}
+
+function processNextTurnMultiplayer() {
+    if (Network.isHost) {
+        const startTime = Date.now();
+        Network.broadcastEvent({ type: 'TURN_START', startTime });
+        handleTurnStart(startTime);
+        Network.syncState(); // Snapshot
+    }
+}
+
+function processNextTurnOffline() {
+    const startTime = Date.now();
+    handleTurnStart(startTime);
 }
 
 function handleTurnStart(startTime) {
@@ -418,11 +437,9 @@ function handleTurnStart(startTime) {
     updateUI();
     startTurnTimer();
     
-    if (typeof Network !== 'undefined' && Network.roomId && Network.isHost) {
-        const cp = state.players[state.currentPlayerIndex];
-        if (cp.isBot && state.status === 'playing') {
-            runBotSequence();
-        }
+    const cp = state.players[state.currentPlayerIndex];
+    if (cp.isBot && state.status === 'playing') {
+        runBotSequence();
     }
 }
 
