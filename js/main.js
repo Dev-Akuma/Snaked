@@ -3,6 +3,11 @@
    ========================================================================== */
 let gameTimerInterval = null;
 
+// Real-time timer timestamps
+state.turnEndTime = null;
+state.gameEndTime = null;
+state.pauseStartedAt = null;
+
 function initGame(modeOrConfig) {
     AudioSys.startBGM();
     AudioSys.toggleMute();
@@ -107,10 +112,21 @@ function togglePause() {
     document.getElementById('btn-pause-game').innerHTML = state.isPaused ? ICONS.resume : ICONS.pause;
     
     if (state.isPaused) {
+        state.pauseStartedAt = Date.now();
         clearTurnTimer(); 
         DOM.pauseModal.classList.remove('hidden');
         DOM.pauseModal.classList.add('flex');
     } else {
+        const pausedDuration =
+        Date.now() - state.pauseStartedAt;
+
+        if (state.turnEndTime) {
+            state.turnEndTime += pausedDuration;
+        }
+
+        if (state.gameEndTime) {
+            state.gameEndTime += pausedDuration;
+        }
         DOM.pauseModal.classList.remove('flex');
         DOM.pauseModal.classList.add('hidden');
         
@@ -123,49 +139,68 @@ function togglePause() {
 
 function startTurnTimer() {
     clearTurnTimer();
-    if (state.status !== 'playing' && state.status !== 'trap_placement') return;
-    const cp = state.players[state.currentPlayerIndex];
-    if (cp.isBot || state.isAnimating || state.isPaused) return;
 
-    // Use configured per-turn time (0 = no limit)
-    const turnLimit = (state.gameConfig && typeof state.gameConfig.turnTime === 'number') ? state.gameConfig.turnTime : 10;
+    if (state.status !== 'playing' && state.status !== 'trap_placement') return;
+
+    const cp = state.players[state.currentPlayerIndex];
+
+    if (cp.isBot || state.isPaused) return;
+
+    // Configured turn limit
+    const turnLimit =
+        (state.gameConfig &&
+        typeof state.gameConfig.turnTime === 'number')
+            ? state.gameConfig.turnTime
+            : 10;
+
+    // No limit
     if (!turnLimit || turnLimit <= 0) {
-        // No per-turn limit
         state.timeRemaining = 0;
         updateTimerDisplay(true);
         return;
     }
 
-    if (!state.turnStartTime) state.turnStartTime = Date.now();
+    // Create absolute end timestamp
+    state.turnEndTime = Date.now() + (turnLimit * 1000);
 
     turnTimerInterval = setInterval(() => {
-        if (state.isPaused || state.isAnimating) {
-            state.turnStartTime += 1000; // shift forward so timer doesn't count down while paused
-            return;
-        }
-        
-        let elapsed = Math.floor((Date.now() - state.turnStartTime) / 1000);
-        state.timeRemaining = turnLimit - elapsed;
-        
-        if (state.timeRemaining < 0) state.timeRemaining = 0;
+
+        if (state.isPaused) return;
+
+        const remainingMs = state.turnEndTime - Date.now();
+
+        state.timeRemaining =
+            Math.max(0, Math.ceil(remainingMs / 1000));
+
         updateTimerDisplay();
 
         if (state.timeRemaining <= 0) {
+
             clearTurnTimer();
-            if (typeof Network !== 'undefined' && Network.roomId && !Network.isHost) {
-                // Clients do nothing. Just wait for Host to auto-roll.
+
+            if (
+                typeof Network !== 'undefined' &&
+                Network.roomId &&
+                !Network.isHost
+            ) {
+                // Clients wait for host
             } else {
-                // Host or Offline
+
                 if (state.status === 'trap_placement') {
                     state.status = 'playing';
                     updateUI();
-                    setTimeout(() => handleRollClick(), 100);
+
+                    setTimeout(() => {
+                        handleRollClick();
+                    }, 100);
+
                 } else {
                     handleRollClick();
                 }
             }
         }
-    }, 1000);
+
+    }, 250); // smoother updates
 }
 
 function clearTurnTimer() {
@@ -175,28 +210,49 @@ function clearTurnTimer() {
 }
 
 function startGameTimer() {
-    // global game timer (leader wins on expiry)
+
     clearGameTimer();
-    if (!state.gameConfig || !state.gameConfig.gameTime || state.gameConfig.gameTime <= 0) {
+
+    if (
+        !state.gameConfig ||
+        !state.gameConfig.gameTime ||
+        state.gameConfig.gameTime <= 0
+    ) {
         updateGlobalTimerDisplay(true);
         return;
     }
-    state.gameTimeRemaining = state.gameConfig.gameTime;
-    updateGlobalTimerDisplay();
+
+    // Absolute game end timestamp
+    state.gameEndTime =
+        Date.now() + (state.gameConfig.gameTime * 1000);
+
     gameTimerInterval = setInterval(() => {
-        if (state.isPaused || state.isAnimating || state.status !== 'playing') return;
-        state.gameTimeRemaining--;
+
+        if (state.isPaused || state.status !== 'playing') return;
+
+        const remainingMs =
+            state.gameEndTime - Date.now();
+
+        state.gameTimeRemaining =
+            Math.max(0, Math.ceil(remainingMs / 1000));
+
         updateGlobalTimerDisplay();
-        
+
         if (state.gameTimeRemaining <= 0) {
+
             clearGameTimer();
-            // Determine leader (highest position, tie-breaker by position then id)
-            const leader = [...state.players].sort((a,b) => b.position - a.position || a.id - b.id)[0];
+
+            const leader = [...state.players].sort(
+                (a, b) =>
+                    b.position - a.position ||
+                    a.id - b.id
+            )[0];
+
             handleWin(leader);
         }
-    }, 1000);
-}
 
+    }, 250);
+}
 function clearGameTimer() {
     if (gameTimerInterval) clearInterval(gameTimerInterval);
     gameTimerInterval = null;
