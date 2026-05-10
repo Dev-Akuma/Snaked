@@ -138,8 +138,16 @@ async function executeRoll(roll1, roll2, rouletteReward) {
     }
 
     state.isAnimating = false;
-    await delay(200); 
-    await processNextTurn();
+    await delay(200);
+
+    // ONLY HOST OR OFFLINE advances turns
+    if (
+        typeof Network === 'undefined' ||
+        !Network.roomId ||
+        Network.isHost
+    ) {
+        await processNextTurn();
+    }
 }
 
 async function resolveCascadesVisually(cp) {
@@ -415,6 +423,14 @@ async function processNextTurn() {
         processNextTurnMultiplayer();
     } else {
         processNextTurnOffline();
+    }
+
+    if (
+    typeof Network !== 'undefined' &&
+    Network.roomId &&
+    Network.isHost
+    ) {
+        Network.syncState();
     }
 }
 
