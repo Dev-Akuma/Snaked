@@ -173,9 +173,26 @@ function generateRandomBoard() {
     const ladders = {};
     const usedTiles = new Set([1, 100]); // Forbidden tiles
     
-    const minDistance = 5; // Min tile distance between structures
-    const numSnakes = 6 + Math.floor(Math.random() * 3); // 6-8 snakes
-    const numLadders = 6 + Math.floor(Math.random() * 3); // 6-8 ladders
+    const minDistance = 3; // Min tile distance between structures
+    const minStructures = 4;
+    const maxStructures = 6;
+    const numSnakes = minStructures + Math.floor(Math.random() * (maxStructures - minStructures + 1));
+    const numLadders = minStructures + Math.floor(Math.random() * (maxStructures - minStructures + 1));
+
+    const makeRange = (start, end) => {
+        const range = [];
+        for (let tile = start; tile <= end; tile++) range.push(tile);
+        return range;
+    };
+
+    const shuffle = (values) => {
+        const result = values.slice();
+        for (let index = result.length - 1; index > 0; index--) {
+            const swapIndex = Math.floor(Math.random() * (index + 1));
+            [result[index], result[swapIndex]] = [result[swapIndex], result[index]];
+        }
+        return result;
+    };
     
     /**
      * Check if a tile is valid for placement (not too close to others)
@@ -187,48 +204,56 @@ function generateRandomBoard() {
         }
         return true;
     };
-    
-    // Generate SNAKES (high tile → low tile, going DOWN)
-    let snakesCreated = 0;
-    let attempts = 0;
-    while (snakesCreated < numSnakes && attempts < 100) {
-        attempts++;
-        const start = 11 + Math.floor(Math.random() * 80); // 11-90
-        
-        if (!isValidPlacement(start)) continue;
-        
-        // End must be significantly lower
-        const drop = 5 + Math.floor(Math.random() * 30); // Drop 5-35 tiles
-        const end = Math.max(2, start - drop);
-        
-        if (isValidPlacement(end) && !snakes[start] && !snakes[end] && start > end) {
-            snakes[start] = end;
+
+    const getCandidatePairs = (type) => {
+        const pairs = [];
+        const startTiles = type === 'ladder'
+            ? makeRange(2, 81)
+            : makeRange(20, 95);
+
+        for (const start of shuffle(startTiles)) {
+            if (!isValidPlacement(start)) continue;
+
+            const endTiles = type === 'ladder'
+                ? makeRange(start + 5, Math.min(100, start + 35))
+                : makeRange(Math.max(2, start - 35), start - 5);
+
+            for (const end of shuffle(endTiles)) {
+                if (type === 'ladder' && end <= start) continue;
+                if (type === 'snake' && end >= start) continue;
+                if (!isValidPlacement(end)) continue;
+                pairs.push({ start, end });
+            }
+        }
+
+        return shuffle(pairs);
+    };
+
+    const placeStructures = (collection, type, targetCount) => {
+        let safety = 0;
+
+        while (Object.keys(collection).length < targetCount && safety < 200) {
+            safety++;
+
+            const pairs = getCandidatePairs(type);
+            if (!pairs.length) break;
+
+            const { start, end } = pairs[Math.floor(Math.random() * pairs.length)];
+            collection[start] = end;
             usedTiles.add(start);
             usedTiles.add(end);
-            snakesCreated++;
         }
-    }
+
+        return Object.keys(collection).length;
+    };
     
-    // Generate LADDERS (low tile → high tile, going UP)
-    let laddersCreated = 0;
-    attempts = 0;
-    while (laddersCreated < numLadders && attempts < 100) {
-        attempts++;
-        const start = 2 + Math.floor(Math.random() * 80); // 2-81
-        
-        if (!isValidPlacement(start)) continue;
-        
-        // End must be significantly higher
-        const climb = 5 + Math.floor(Math.random() * 30); // Climb 5-35 tiles
-        const end = Math.min(100, start + climb);
-        
-        if (isValidPlacement(end) && !ladders[start] && !ladders[end] && start < end) {
-            ladders[start] = end;
-            usedTiles.add(start);
-            usedTiles.add(end);
-            laddersCreated++;
-        }
-    }
+    // Place the minimum first so every board has at least 4 of each.
+    placeStructures(ladders, 'ladder', minStructures);
+    placeStructures(snakes, 'snake', minStructures);
+
+    // Add a few extra random structures when space allows.
+    placeStructures(ladders, 'ladder', numLadders);
+    placeStructures(snakes, 'snake', numSnakes);
     
     return { snakes, ladders };
 }

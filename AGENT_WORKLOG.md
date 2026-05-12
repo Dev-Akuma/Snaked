@@ -1,5 +1,40 @@
 # Agent Worklog - Snaked Game
 
+**Date:** May 12, 2026  
+**Task:** Guarantee random snakes and ladders minimums  
+**Status:** ✅ COMPLETED
+
+## Problem Statement
+The random board generator could return games with zero ladders because it relied on capped best-effort placement loops. That made the board feel repetitive and sometimes completely missing ladder paths.
+
+## Root Cause Analysis
+
+### Issue Found in `js/config.js`
+
+1. **`generateRandomBoard()`**
+    - Used a 100-attempt loop for each structure type
+    - Ladders were frequently exhausted by the placement constraints before any were committed
+    - The function returned partial results instead of guaranteeing the requested minimum count
+
+## Solution Implemented
+
+### Strategy: Minimum-first placement
+- Replaced the capped attempt loops with a candidate-pair placement strategy
+- Always places at least 4 ladders and 4 snakes before adding extra random structures
+- Reduced the spacing constraint slightly so the board has enough valid placement options
+- Kept the board random by shuffling candidate starts and ends each run
+
+## Files Modified
+- `js/config.js` - Random board generation logic
+
+## Validation
+✅ Repeated generator simulation passed with minimum counts preserved (`minS: 4`, `minL: 4`)
+✅ No zero-ladder boards observed across repeated runs
+
+## Notes
+- Offline and multiplayer modes both consume `generateRandomBoard()`, so this fixes both game paths
+
+
 **Date:** May 6, 2026  
 **Task:** Separate offline and multiplayer game modes  
 **Status:** ✅ COMPLETED

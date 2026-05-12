@@ -387,7 +387,9 @@ const Network = {
                 
             case 'EXECUTE_ROLL':
                 state.isAwaitingHost = false;
-                if (typeof executeRoll === 'function') executeRoll(payload.roll1, payload.roll2, payload.rouletteReward);
+                if (typeof executeRoll === 'function') 
+                    AudioSys.rollResult();
+                    executeRoll(payload.roll1, payload.roll2, payload.rouletteReward);
                 break;
                 
             case 'REQUEST_POWERUP':
@@ -410,7 +412,9 @@ const Network = {
                 
             case 'EXECUTE_POWERUP':
                 state.isAwaitingHost = false;
-                if (typeof executePowerup === 'function') executePowerup(payload.tileIndex, payload.powerupType, payload.targetId);
+                if (typeof executePowerup === 'function')
+                    AudioSys.powerup();
+                    executePowerup(payload.tileIndex, payload.powerupType, payload.targetId);
                 break;
                 
             case 'TURN_START':
@@ -498,7 +502,10 @@ async function handleStartOnlineGame() {
             setTimeout(() => {
                 drawConnections();
                 updateUI();
+
+                startGameTimer();
                 startTurnTimer();
+
             }, 50);
         }
     }
