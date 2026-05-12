@@ -102,7 +102,7 @@ function renderSettingsUI(mode) {
                     header.innerHTML = `<span class="text-emerald-400 font-black tracking-wide text-sm">Host (You)</span>`;
                     const typeBadge = document.createElement('div');
                     typeBadge.className = 'bg-emerald-500/20 text-emerald-400 px-3 py-1.5 text-xs font-black rounded-md flex items-center gap-1.5 shadow-sm';
-                    typeBadge.innerHTML = `<span class="w-3.5 h-3.5">${ICONS.user}</span> ${p.name || 'HUMAN'}`;
+                    typeBadge.innerHTML = `<img src="${window.getAvatarAsset('user')}" alt="" style="width:0.95rem;height:0.95rem;object-fit:contain;display:block;"> ${p.name || 'HUMAN'}`;
                     header.appendChild(typeBadge);
                 } else {
                     header.innerHTML = `<span class="text-slate-400 font-black tracking-wide text-sm">Opponent ${i}</span>`;
@@ -120,11 +120,11 @@ function renderSettingsUI(mode) {
                 
                 const btnHuman = document.createElement('div');
                 btnHuman.className = `cursor-pointer px-3 py-1.5 text-xs font-black rounded-md flex items-center gap-1.5 transition-all ${p.type === 'human' ? 'bg-emerald-500/20 text-emerald-400 shadow-sm' : 'text-slate-500 hover:text-slate-300'}`;
-                btnHuman.innerHTML = `<span class="w-3.5 h-3.5">${ICONS.user}</span> HUMAN`;
+                btnHuman.innerHTML = `<img src="${window.getAvatarAsset('user')}" alt="" style="width:0.95rem;height:0.95rem;object-fit:contain;display:block;"> HUMAN`;
                 
                 const btnCpu = document.createElement('div');
                 btnCpu.className = `cursor-pointer px-3 py-1.5 text-xs font-black rounded-md flex items-center gap-1.5 transition-all ${p.type === 'cpu' ? 'bg-blue-500/20 text-blue-400 shadow-sm' : 'text-slate-500 hover:text-slate-300'}`;
-                btnCpu.innerHTML = `<span class="w-3.5 h-3.5">${ICONS.bot}</span> CPU`;
+                btnCpu.innerHTML = `<img src="${window.getAvatarAsset('bot')}" alt="" style="width:0.95rem;height:0.95rem;object-fit:contain;display:block;"> CPU`;
                 
                 btnHuman.onclick = () => { p.type = 'human'; renderSlots(); };
                 btnCpu.onclick = () => { p.type = 'cpu'; renderSlots(); };

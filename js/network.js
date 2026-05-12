@@ -197,7 +197,13 @@ const Network = {
             const avatar = document.createElement('div');
             avatar.className = 'w-8 h-8 rounded-full flex items-center justify-center text-white font-bold';
             avatar.style.backgroundColor = p.color.hex;
-            avatar.innerHTML = ICONS[p.profileAvatar] || ICONS.user;
+
+            const avatarImage = document.createElement('img');
+            avatarImage.className = 'lobby-avatar-image';
+            avatarImage.src = window.getAvatarAsset(p.profileAvatar);
+            avatarImage.alt = `${p.name} avatar`;
+            avatarImage.loading = 'eager';
+            avatar.appendChild(avatarImage);
             
             const name = document.createElement('span');
             name.className = 'font-bold text-slate-200';

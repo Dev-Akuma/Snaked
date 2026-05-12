@@ -41,15 +41,38 @@ const ICONS = {
     freezeTile: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M2 12h20M4.9 4.9l14.2 14.2M19.1 4.9L4.9 19.1"></path></svg>`,
     timer: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>`,
     stopwatch: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"></circle><polyline points="12 9 12 13 14 15"></polyline><line x1="10" y1="2" x2="14" y2="2"></line></svg>`
+    ,pencil: `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>`
 };
+
+const AVATAR_ASSETS = {
+    user: encodeURI('UiUx/icon library/target.png'),
+    bot: encodeURI('UiUx/icon library/bot.png'),
+    trophy: encodeURI('UiUx/icon library/trophy.png'),
+    star: encodeURI('UiUx/icon library/star.png'),
+    fire: encodeURI('UiUx/icon library/comet.png'),
+    snake: encodeURI('UiUx/icon library/snake.png'),
+    dice1: encodeURI('UiUx/icon library/dice 1.png'),
+    dice3: encodeURI('UiUx/icon library/dice 3.png'),
+    flower: encodeURI('UiUx/icon library/realistic flower.png'),
+    petals: encodeURI('UiUx/icon library/flower petals.png')
+};
+
+const getAvatarAsset = (avatarId) => AVATAR_ASSETS[avatarId] || AVATAR_ASSETS.user;
+
+window.AVATAR_ASSETS = AVATAR_ASSETS;
+window.getAvatarAsset = getAvatarAsset;
 
 // Initialize icons on DOM load
 document.addEventListener('DOMContentLoaded', () => {
     // Menu icons
-    if (document.getElementById('icon-solo-menu')) document.getElementById('icon-solo-menu').innerHTML = ICONS.user;
+    if (document.getElementById('icon-solo-menu')) document.getElementById('icon-solo-menu').innerHTML = `<img src="${AVATAR_ASSETS.user}" alt="" style="width:1.15em;height:1.15em;object-fit:contain;display:block;filter:brightness(0) invert(1) drop-shadow(0 1px 1px rgba(0,0,0,0.55));">`;
     if (document.getElementById('icon-multi-menu')) document.getElementById('icon-multi-menu').innerHTML = ICONS.users;
     if (document.getElementById('icon-create-room')) document.getElementById('icon-create-room').innerHTML = ICONS.plus;
     if (document.getElementById('icon-join-room')) document.getElementById('icon-join-room').innerHTML = ICONS.signIn;
+    if (document.getElementById('icon-menu-step-dice')) document.getElementById('icon-menu-step-dice').innerHTML = ICONS.diceSmall;
+    if (document.getElementById('icon-menu-step-move')) document.getElementById('icon-menu-step-move').innerHTML = ICONS.resume;
+    if (document.getElementById('icon-menu-step-left')) document.getElementById('icon-menu-step-left').innerHTML = ICONS.leftTile;
+    if (document.getElementById('icon-menu-step-right')) document.getElementById('icon-menu-step-right').innerHTML = ICONS.rightTile;
     
     // Game screen icons (may not exist on menu screen)
     if (document.getElementById('icon-trophy')) document.getElementById('icon-trophy').innerHTML = ICONS.trophy;

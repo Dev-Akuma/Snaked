@@ -8,12 +8,34 @@ const Profile = {
         avatar: "user", 
         colorHex: PLAYER_COLORS[0].hex
     },
+    avatars: [
+        { id: 'user', label: 'Target' },
+        { id: 'bot', label: 'Bot' },
+        { id: 'trophy', label: 'Trophy' },
+        { id: 'star', label: 'Star' },
+        { id: 'fire', label: 'Comet' },
+        { id: 'snake', label: 'Snake' },
+        { id: 'dice1', label: 'Dice One' },
+        { id: 'dice3', label: 'Dice Three' },
+        { id: 'flower', label: 'Flower' },
+        { id: 'petals', label: 'Petals' }
+    ],
+
+    normalizeAvatar: (avatarId) => {
+        const option = Profile.avatars.find((entry) => entry.id === avatarId);
+        return option ? option.id : Profile.avatars[0].id;
+    },
+
+    getAvatarOption: (avatarId) => {
+        return Profile.avatars.find((entry) => entry.id === avatarId) || Profile.avatars[0];
+    },
 
     load: () => {
         const saved = localStorage.getItem('snaked_profile');
         if (saved) {
             try {
                 Profile.data = { ...Profile.data, ...JSON.parse(saved) };
+                Profile.data.avatar = Profile.normalizeAvatar(Profile.data.avatar);
             } catch (e) {
                 console.error("Failed to parse profile", e);
             }
@@ -28,74 +50,98 @@ const Profile = {
         return PLAYER_COLORS.find(c => c.hex === Profile.data.colorHex) || PLAYER_COLORS[0];
     },
 
+    cycleAvatar: (direction) => {
+        const currentIndex = Profile.avatars.findIndex((entry) => entry.id === Profile.data.avatar);
+        const nextIndex = (currentIndex + direction + Profile.avatars.length) % Profile.avatars.length;
+        Profile.data.avatar = Profile.avatars[nextIndex].id;
+        Profile.save();
+        Profile.renderMenuPanel();
+    },
+
     renderMenuPanel: () => {
         const panel = document.getElementById('profile-panel');
         if (!panel) return;
         
         panel.innerHTML = '';
 
-        const title = document.createElement('h3');
-        title.className = 'text-slate-300 font-bold mb-4 uppercase tracking-widest text-sm';
-        title.innerText = 'Your Online Profile';
-        panel.appendChild(title);
+        const shell = document.createElement('div');
+        shell.className = 'menu-profile-shell';
 
-        // Name Input
-        const nameGroup = document.createElement('div');
-        nameGroup.className = 'mb-4';
+        const avatarRow = document.createElement('div');
+        avatarRow.className = 'menu-profile-avatar-row';
+
+        const leftArrow = document.createElement('button');
+        leftArrow.type = 'button';
+        leftArrow.className = 'menu-avatar-arrow';
+        leftArrow.setAttribute('aria-label', 'Previous avatar');
+        leftArrow.innerText = '‹';
+        leftArrow.onclick = () => Profile.cycleAvatar(-1);
+
+        const avatarStage = document.createElement('div');
+        avatarStage.className = 'menu-profile-avatar-stage';
+        avatarStage.style.background = `radial-gradient(circle at 30% 25%, rgba(255,255,255,0.22), transparent 40%), ${Profile.data.colorHex}`;
+
+        const avatarImage = document.createElement('img');
+        avatarImage.className = 'menu-profile-avatar-image';
+        avatarImage.src = window.getAvatarAsset(Profile.data.avatar);
+        avatarImage.alt = `${Profile.getAvatarOption(Profile.data.avatar).label} avatar`;
+        avatarImage.loading = 'eager';
+        avatarStage.appendChild(avatarImage);
+
+        const rightArrow = document.createElement('button');
+        rightArrow.type = 'button';
+        rightArrow.className = 'menu-avatar-arrow';
+        rightArrow.setAttribute('aria-label', 'Next avatar');
+        rightArrow.innerText = '›';
+        rightArrow.onclick = () => Profile.cycleAvatar(1);
+
+        avatarRow.appendChild(leftArrow);
+        avatarRow.appendChild(avatarStage);
+        avatarRow.appendChild(rightArrow);
+
+        const nameRow = document.createElement('div');
+        nameRow.className = 'menu-profile-name-row';
+
+        const pencil = document.createElement('span');
+        pencil.className = 'menu-profile-pencil';
+        pencil.innerHTML = ICONS.pencil;
+
         const nameInput = document.createElement('input');
         nameInput.type = 'text';
         nameInput.value = Profile.data.name;
         nameInput.maxLength = 12;
-        nameInput.className = 'w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-white font-bold focus:border-emerald-500 focus:outline-none transition-colors';
+        nameInput.className = 'menu-profile-name-input';
         nameInput.placeholder = 'Enter Name';
         nameInput.onchange = (e) => {
-            Profile.data.name = e.target.value.trim() || "Player";
-            Profile.save();
-        };
-        nameGroup.appendChild(nameInput);
-        panel.appendChild(nameGroup);
-
-        // Avatar Preview & Selector
-        const avatarGroup = document.createElement('div');
-        avatarGroup.className = 'mb-4 flex items-center justify-between bg-slate-900 p-3 rounded-lg border border-slate-700';
-        
-        const avatarPreview = document.createElement('div');
-        avatarPreview.className = 'w-10 h-10 flex items-center justify-center text-slate-300';
-        avatarPreview.innerHTML = ICONS[Profile.data.avatar] || ICONS.user;
-        
-        const avatarBtn = document.createElement('button');
-        avatarBtn.className = 'text-xs font-bold text-slate-400 hover:text-white bg-slate-800 px-3 py-1.5 rounded';
-        avatarBtn.innerText = 'Change Avatar';
-        
-        const availableAvatars = ['user', 'bot', 'trophy', 'star', 'fire']; // some icon keys
-        avatarBtn.onclick = () => {
-            let idx = availableAvatars.indexOf(Profile.data.avatar);
-            idx = (idx + 1) % availableAvatars.length;
-            Profile.data.avatar = availableAvatars[idx];
+            Profile.data.name = e.target.value.trim() || 'Player';
             Profile.save();
             Profile.renderMenuPanel();
         };
 
-        avatarGroup.appendChild(avatarPreview);
-        avatarGroup.appendChild(avatarBtn);
-        panel.appendChild(avatarGroup);
+        nameRow.appendChild(pencil);
+        nameRow.appendChild(nameInput);
 
-        // Color Picker
         const colorGroup = document.createElement('div');
-        colorGroup.className = 'flex flex-wrap gap-2';
+        colorGroup.className = 'menu-profile-colors';
         PLAYER_COLORS.forEach(c => {
-            const dot = document.createElement('div');
+            const dot = document.createElement('button');
             const isSelected = Profile.data.colorHex === c.hex;
-            dot.className = `w-8 h-8 rounded-full cursor-pointer transition-all ${isSelected ? 'scale-110 ring-2 ring-white shadow-lg' : 'opacity-50 hover:opacity-100 hover:scale-105'}`;
+            dot.type = 'button';
+            dot.className = `menu-profile-color-dot ${isSelected ? 'is-selected' : ''}`;
             dot.style.backgroundColor = c.hex;
-            dot.onclick = () => { 
-                Profile.data.colorHex = c.hex; 
+            dot.setAttribute('aria-label', c.name);
+            dot.onclick = () => {
+                Profile.data.colorHex = c.hex;
                 Profile.save();
                 Profile.renderMenuPanel();
             };
             colorGroup.appendChild(dot);
         });
-        panel.appendChild(colorGroup);
+
+        shell.appendChild(avatarRow);
+        shell.appendChild(nameRow);
+        shell.appendChild(colorGroup);
+        panel.appendChild(shell);
     }
 };
 
