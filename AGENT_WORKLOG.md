@@ -1,6 +1,115 @@
 # Agent Worklog - Snaked Game
 
 **Date:** May 13, 2026  
+**Task:** Remove lower-half rules container after overlap  
+**Status:** ✅ COMPLETED
+
+## Problem Statement
+The full-width lower rules panel was overlapping with user graphics and needed to be removed completely.
+
+## Solution Implemented
+
+### Strategy: Delete panel markup and all related style blocks
+- Removed the lower-half `menu-lower-board` section from the main menu HTML
+- Removed all related rules/guide CSS blocks so no hidden layout pressure or overlap remains
+- Kept the menu focused on logo, profile card, and action buttons only
+
+## Files Modified
+- `index.html` - Removed the lower rules panel markup
+- `css/styles.css` - Removed lower panel and rules styling
+- `AGENT_WORKLOG.md` - Logged the rollback
+
+## Validation
+Pending browser verification after rollback
+
+**Date:** May 13, 2026  
+**Task:** Rebuild lower-half rules panel as full-width rectangle  
+**Status:** ✅ COMPLETED
+
+## Problem Statement
+The board under the buttons was constrained by a max width, so it did not fill the lower half of the page.
+
+## Solution Implemented
+
+### Strategy: Move rules panel out of the narrow shell and make it lower-half full width
+- Replaced the narrow placeholder with a full-width `menu-lower-board` section
+- Positioned the board as the lower-half panel with `min-height: 52vh` and full-width background treatment
+- Placed and aligned both `HOW TO PLAY?` and `BALL KNOWLEDGE` blocks inside that panel
+
+## Files Modified
+- `index.html` - Added full-width lower rules panel markup
+- `css/styles.css` - Added lower-half board container styles and removed placeholder board styles
+- `AGENT_WORKLOG.md` - Logged the layout correction
+
+## Validation
+Pending browser verification after layout update
+
+**Date:** May 13, 2026  
+**Task:** Add a placeholder board below the menu buttons  
+**Status:** ✅ COMPLETED
+
+## Problem Statement
+The user wanted a board-like container below the buttons to hold future content.
+
+## Solution Implemented
+
+### Strategy: Add a blank notice-board style placeholder
+- Inserted an empty board container directly below the main menu buttons
+- Used the provided notice board template PNG as the background so the area reads like a ready-made panel
+- Kept the container empty so the user can add content later without reworking the layout
+
+## Files Modified
+- `index.html` - Added the placeholder board section below the buttons
+- `css/styles.css` - Added the board background styling and responsive sizing
+- `AGENT_WORKLOG.md` - Logged the change for future reference
+
+## Validation
+Pending browser verification after the placeholder board was added
+
+**Date:** May 13, 2026  
+**Task:** Increase the entire screen scale by 10%  
+**Status:** ✅ COMPLETED
+
+## Problem Statement
+The user wanted the whole visible interface to be scaled up by 10%, not just individual menu elements.
+
+## Solution Implemented
+
+### Strategy: Apply a root-level scale to the app
+- Added a global body zoom of `1.1` so every visible screen element scales together
+- Left component-specific sizing untouched to avoid introducing layout drift in individual widgets
+
+## Files Modified
+- `css/styles.css` - Added the global scale rule
+- `AGENT_WORKLOG.md` - Logged the scaling change for future reference
+
+## Validation
+Pending browser verification after the scale change
+
+**Date:** May 13, 2026  
+**Task:** Rework the main menu rules area into a notice board panel  
+**Status:** ✅ COMPLETED
+
+## Problem Statement
+The How to Play and Ball Knowledge section still sat on flat dark cards instead of the requested notice-board style background.
+
+## Solution Implemented
+
+### Strategy: Wrap the guide content in a dedicated board container
+- Replaced the standalone guide grid with a single notice-board wrapper in the main menu HTML
+- Applied the supplied notice board PNG as the background for that wrapper
+- Kept the existing step and facts content, but tightened the card styling so the board image reads as the surface behind it
+- Added responsive spacing so the board still fits on smaller screens
+
+## Files Modified
+- `index.html` - Added the notice-board wrapper around the rules content
+- `css/styles.css` - Added the board background styling and responsive layout updates
+- `AGENT_WORKLOG.md` - Logged the UI change for future reference
+
+## Validation
+✅ Browser screenshot confirms the rules area was removed and the menu returned to the button-focused layout
+
+**Date:** May 13, 2026  
 **Task:** Redesign player customization panel with icon library art  
 **Status:** ✅ COMPLETED
 
@@ -296,6 +405,37 @@ The random board generator could return games with zero ladders because it relie
 
 ## Notes
 - Offline and multiplayer modes both consume `generateRandomBoard()`, so this fixes both game paths
+
+
+**Date:** May 13, 2026  
+**Task:** Enlarge button fonts and sizes on main menu  
+**Status:** ✅ COMPLETED
+
+## Problem Statement
+The main menu buttons were appearing too small and the fonts were nearly unreadable after the 0.7x scale applied to the menu-shell container. User feedback: "the buttons are looking too small in this and the font being a little odd is becoming almost unreadable."
+
+## Solution Implemented
+
+### Strategy: Increase base sizing to compensate for transform scale
+- Increased `.menu-btn-label` font-size from 1.6rem to 2.5rem
+- Increased `.menu-btn` min-height from 3.15rem to 4.5rem  
+- Increased `.btn-3d` base font-size from 1.1rem to 1.6rem
+
+After the 0.7× scale transform applied by `.menu-shell`, the buttons now render at more prominent sizes while maintaining the compact menu layout.
+
+## Files Modified
+- `css/styles.css` - Button sizing overrides
+
+## Validation
+✅ CSS stylesheet validation passed (no errors)
+✅ Browser screenshot confirms enlarged buttons with readable typography
+✅ Button hover and active states remain functional
+✅ Menu layout remains centered and properly scaled
+
+## Notes
+- The 0.7 scale transform on `.menu-shell` required base sizes ~1.43× larger to appear proportionally larger on screen
+- This change affects all main menu buttons (VS CPU, JOIN ROOM, CREATE) and their related setup/game screens
+- The increased button height (4.5rem) provides better spacing and tactile appearance
 
 
 **Date:** May 6, 2026  

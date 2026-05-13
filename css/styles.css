@@ -2,6 +2,10 @@
    CUSTOM CSS & MICRO-ANIMATIONS
    ========================================================================== */
 
+body {
+    zoom: 1.1;
+}
+
 /* Board Grid Base */
 .board-grid {
     display: grid;
@@ -278,11 +282,18 @@
     cursor: pointer;
     transition: transform 0.18s ease, box-shadow 0.18s ease, filter 0.18s ease, border-color 0.18s ease;
     overflow: hidden;
-    font-size: 1.1rem;
+    font-size: 1.6rem;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 0.45rem;
+    color: #ffffff;
+    text-shadow:
+        -1px -1px 0 #000000,
+        1px -1px 0 #000000,
+        -1px 1px 0 #000000,
+        1px 1px 0 #000000,
+        0 2px 0 rgba(0, 0, 0, 0.55);
 }
 
 .btn-3d:disabled {
@@ -467,7 +478,9 @@
 
 #screen-main-menu {
     position: relative;
-    overflow-y: auto;
+    min-height: 100vh;
+    height: auto;
+    overflow-y: visible;
     overflow-x: hidden;
     background: #081a2d;
 }
@@ -659,19 +672,20 @@
     padding-top: 0.15rem;
 }
 
-.menu-profile-pencil {
-    width: 1.15rem;
-    height: 1.15rem;
-    color: rgba(255, 255, 255, 0.95);
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
+.menu-profile-edit-label {
+    color: #ffffff;
+    font-family: 'Bahiana', cursive;
+    font-size: 1.35rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    white-space: nowrap;
     flex-shrink: 0;
-}
-
-.menu-profile-pencil svg {
-    width: 100%;
-    height: 100%;
+    text-shadow:
+        -1px -1px 0 #000000,
+        1px -1px 0 #000000,
+        -1px 1px 0 #000000,
+        1px 1px 0 #000000,
+        0 2px 0 rgba(0, 0, 0, 0.55);
 }
 
 .menu-profile-name-input {
@@ -731,7 +745,7 @@
 
 .menu-btn {
     position: relative;
-    min-height: 3.15rem;
+    min-height: 4.5rem;
     font-family: 'Bahiana', cursive;
     font-weight: 900;
     border: none;
@@ -745,6 +759,13 @@
     overflow: hidden;
     text-transform: uppercase;
     letter-spacing: 0.03em;
+    color: #ffffff;
+    text-shadow:
+        -1px -1px 0 #000000,
+        1px -1px 0 #000000,
+        -1px 1px 0 #000000,
+        1px 1px 0 #000000,
+        0 2px 0 rgba(0, 0, 0, 0.55);
     box-shadow:
         0 8px 0 rgba(0, 0, 0, 0.22),
         0 10px 20px rgba(0, 0, 0, 0.25),
@@ -767,7 +788,14 @@
 .menu-btn-label {
     display: block;
     line-height: 1;
-    font-size: 1.6rem;
+    font-size: 2.5rem;
+    color: #ffffff;
+    text-shadow:
+        -1px -1px 0 #000000,
+        1px -1px 0 #000000,
+        -1px 1px 0 #000000,
+        1px 1px 0 #000000,
+        0 2px 0 rgba(0, 0, 0, 0.55);
 }
 
 .menu-btn-primary {
@@ -790,11 +818,7 @@
 
 #icon-solo-menu,
 #icon-create-room,
-#icon-join-room,
-#icon-menu-step-dice,
-#icon-menu-step-move,
-#icon-menu-step-left,
-#icon-menu-step-right {
+#icon-join-room {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -803,152 +827,15 @@
 
 #icon-solo-menu svg,
 #icon-create-room svg,
-#icon-join-room svg,
-#icon-menu-step-dice svg,
-#icon-menu-step-move svg,
-#icon-menu-step-left svg,
-#icon-menu-step-right svg {
+#icon-join-room svg {
     width: 1em;
     height: 1em;
-}
-
-.menu-guide-grid {
-    width: min(100%, 760px);
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 0.85rem;
-    margin-top: 0.35rem;
-}
-
-.menu-guide-card {
-    border-radius: 1rem;
-    padding: 0.9rem 1rem 1rem;
-}
-
-.menu-guide-card-wide {
-    width: 100%;
-}
-
-.menu-section-title {
-    font-family: 'Bahiana', cursive;
-    font-size: 1.8rem;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: #f8fafc;
-    margin-bottom: 0.8rem;
-}
-
-.menu-steps {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.65rem 0.55rem;
-}
-
-.menu-step {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.45rem;
-    text-align: center;
-}
-
-.menu-step p {
-    font-family: 'Bahiana', cursive;
-    font-size: 1.15rem;
-    line-height: 1.15;
-    letter-spacing: 0.04em;
-    color: rgba(248, 250, 252, 0.98);
-}
-
-.menu-step-icon {
-    width: 4rem;
-    height: 4rem;
-    border-radius: 1rem;
-    background: rgba(4, 16, 30, 0.74);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
-}
-
-.menu-step-icon svg {
-    width: 1.9rem;
-    height: 1.9rem;
-}
-
-.menu-step-icon-dice {
-    color: #e5e7eb;
-}
-
-.menu-step-icon-move {
-    color: #ffffff;
-}
-
-.menu-step-icon-power {
-    flex-direction: column;
-    gap: 0.15rem;
-    color: #ffffff;
-}
-
-.menu-step-power-top {
-    font-family: 'Bahiana', cursive;
-    font-size: 1rem;
-    line-height: 1;
-    transform: translateY(0.05rem);
-}
-
-.menu-step-power-row {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.2rem;
-}
-
-.menu-step-power-row svg {
-    width: 1.15rem;
-    height: 1.15rem;
-}
-
-.menu-step-icon-win {
-    font-family: 'Bahiana', cursive;
-    font-size: 1.6rem;
-    color: #ffffff;
-}
-
-.menu-facts {
-    list-style: decimal;
-    margin: 0;
-    padding-left: 1.25rem;
-    display: grid;
-    gap: 0.35rem;
-    color: rgba(248, 250, 252, 0.95);
-    font-family: 'Bahiana', cursive;
-    font-size: 1.1rem;
-    line-height: 1.25;
-    letter-spacing: 0.03em;
-}
-
-.menu-facts li {
-    padding-left: 0.1rem;
 }
 
 @media (min-width: 900px) {
     .menu-shell {
         padding-top: 2.75rem;
         gap: 1.2rem;
-    }
-
-    .menu-guide-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    .menu-steps {
-        grid-template-columns: repeat(4, minmax(0, 1fr));
-    }
-
-    .menu-facts {
-        font-size: 1.15rem;
     }
 }
 
@@ -971,21 +858,8 @@
         font-size: 1.45rem;
     }
 
-    .menu-profile-card,
-    .menu-guide-card {
+    .menu-profile-card {
         width: min(100%, 100%);
-    }
-
-    .menu-steps {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    .menu-step p {
-        font-size: 1rem;
-    }
-
-    .menu-facts {
-        font-size: 1rem;
     }
 }
 

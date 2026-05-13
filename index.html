@@ -12,7 +12,7 @@
         .font-bahnschrift { font-family: 'Bahnschrift', 'Fredoka', sans-serif; }
     </style>
 </head>
-<body class="bg-slate-900 text-slate-200 font-sans h-screen overflow-hidden selection:bg-emerald-500/30 relative">
+<body class="bg-slate-900 text-slate-200 font-sans min-h-screen overflow-x-hidden overflow-y-auto selection:bg-emerald-500/30 relative">
 
     <!-- Ambient background glow -->
     <div class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-emerald-500/5 rounded-full blur-[120px] pointer-events-none z-0"></div>
@@ -49,7 +49,6 @@
                     onclick="AudioSys.menuClick(); openSettings('solo')" 
                     onmouseover="AudioSys.menuHover()"
                     class="menu-btn menu-btn-primary">
-                    <span id="icon-solo-menu"></span>
                     <span class="menu-btn-label">VS CPU</span>
                 </button>
 
@@ -58,7 +57,6 @@
                     onmouseover="AudioSys.menuHover()"
                     class="menu-btn menu-btn-secondary"
                     title="Join an existing match">
-                    <span id="icon-join-room"></span>
                     <span class="menu-btn-label">JOIN ROOM</span>
                 </button>
 
@@ -67,48 +65,10 @@
                     onmouseover="AudioSys.menuHover()"
                     class="menu-btn menu-btn-secondary"
                     title="Create an online match">
-                    <span id="icon-create-room"></span>
                     <span class="menu-btn-label">CREATE</span>
                 </button>
             </section>
 
-            <section class="menu-guide-grid">
-                <article class="menu-guide-card menu-guide-card-wide">
-                    <h2 class="menu-section-title">HOW TO PLAY?</h2>
-                    <div class="menu-steps">
-                        <div class="menu-step">
-                            <div class="menu-step-icon menu-step-icon-dice"><span id="icon-menu-step-dice"></span></div>
-                            <p>CLICK TO ROLL DICE</p>
-                        </div>
-                        <div class="menu-step">
-                            <div class="menu-step-icon menu-step-icon-move"><span id="icon-menu-step-move"></span></div>
-                            <p>PIECE AUTO MOVES</p>
-                        </div>
-                        <div class="menu-step">
-                            <div class="menu-step-icon menu-step-icon-power">
-                                <span class="menu-step-power-top">2x</span>
-                                <span class="menu-step-power-row"><span id="icon-menu-step-left"></span><span id="icon-menu-step-right"></span></span>
-                            </div>
-                            <p>USE POWER UP</p>
-                        </div>
-                        <div class="menu-step">
-                            <div class="menu-step-icon menu-step-icon-win">100</div>
-                            <p>REACH 100TH TILE FIRST</p>
-                        </div>
-                    </div>
-                </article>
-
-                <article class="menu-guide-card menu-guide-card-wide">
-                    <h2 class="menu-section-title">BALL KNOWLEDGE</h2>
-                    <ol class="menu-facts">
-                        <li>DICE AUTO ROLLS ON TURN TIMEOUT!</li>
-                        <li>POWER UP ROULETTE CHARGES +1 PER TURN.</li>
-                        <li>ON ROLLING A 6, THE POWER UP ROULETTE CHARGES FULLY!</li>
-                        <li>YOU CAN USE POWERUP BEFORE THE DICE ROLL.</li>
-                        <li>PLAYING WITH FRIENDS IS A CRAZZILON TIMES MORE FUN!</li>
-                    </ol>
-                </article>
-            </section>
         </div>
     </div>
 
@@ -378,10 +338,10 @@
             <p class="text-slate-400 mb-6 text-sm">Enter the 6-character room code:</p>
             <input type="text" id="join-room-input" maxlength="6" class="w-full bg-slate-950 p-4 rounded-xl text-3xl font-mono font-bold text-center text-white border border-slate-700 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 outline-none uppercase mb-6" placeholder="XXXXXX" />
             <div class="flex flex-col gap-3">
-                <button onclick="handleJoinRoomSubmit()" class="btn-3d btn-3d-secondary w-full py-3">
+                <button onclick="handleJoinRoomSubmit()" class="btn-3d w-full bg-gradient-to-b from-blue-500 to-blue-600 text-white font-bold py-3 rounded-xl shadow-lg border-blue-800">
                     Join Room
                 </button>
-                <button onclick="document.getElementById('modal-join-room').classList.add('hidden'); document.getElementById('modal-join-room').classList.remove('flex');" class="btn-3d btn-3d-neutral w-full py-3">
+                <button onclick="document.getElementById('modal-join-room').classList.add('hidden'); document.getElementById('modal-join-room').classList.remove('flex');" class="btn-3d w-full bg-slate-700 hover:bg-slate-600 text-white font-bold py-3 rounded-xl border-slate-800">
                     Cancel
                 </button>
             </div>

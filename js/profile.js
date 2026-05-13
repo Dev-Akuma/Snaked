@@ -102,14 +102,14 @@ const Profile = {
         const nameRow = document.createElement('div');
         nameRow.className = 'menu-profile-name-row';
 
-        const pencil = document.createElement('span');
-        pencil.className = 'menu-profile-pencil';
-        pencil.innerHTML = ICONS.pencil;
+        const editLabel = document.createElement('span');
+        editLabel.className = 'menu-profile-edit-label';
+        editLabel.innerText = 'EDIT NAME';
 
         const nameInput = document.createElement('input');
         nameInput.type = 'text';
         nameInput.value = Profile.data.name;
-        nameInput.maxLength = 12;
+        nameInput.maxLength = 18;
         nameInput.className = 'menu-profile-name-input';
         nameInput.placeholder = 'Enter Name';
         nameInput.onchange = (e) => {
@@ -118,7 +118,7 @@ const Profile = {
             Profile.renderMenuPanel();
         };
 
-        nameRow.appendChild(pencil);
+        nameRow.appendChild(editLabel);
         nameRow.appendChild(nameInput);
 
         const colorGroup = document.createElement('div');
